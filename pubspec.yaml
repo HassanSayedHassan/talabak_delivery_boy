@@ -47,8 +47,9 @@ dependencies:
   http: ^0.12.2
   convert: ^2.1.1
   flutter_map: any
-
+  custom_switch: ^0.0.1
   flutter_pin_code_fields: ^1.1.0
+  onesignal_flutter: ^2.6.1
 
 dev_dependencies:
   flutter_test:

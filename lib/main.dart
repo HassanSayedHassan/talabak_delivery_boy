@@ -1,16 +1,16 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:talabak_delivery_boy/webServices/notifications.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:talabak_delivery_boy/screans/home_page.dart';
 import 'package:talabak_delivery_boy/screans/log_in_screan.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -19,10 +19,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
+  Notifications notifications;
   @override
   void initState() {
-
+    notifications = new Notifications();
+    OneSignal.shared.init("3bf052b4-bda6-4553-bd78-118ea7909359", iOSSettings: {
+      OSiOSSettings.autoPrompt: false,
+      OSiOSSettings.inAppLaunchUrl: false
+    });
+    OneSignal.shared
+        .setInFocusDisplayType(OSNotificationDisplayType.notification);
+    notifications.setNotificationReceivedHandler();
+    notifications.setNotificationOpenedHandler();
     super.initState();
   }
 

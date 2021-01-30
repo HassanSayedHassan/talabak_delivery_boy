@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,12 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Locations {
   FirebaseAuth auth = FirebaseAuth.instance;
-  getCurrentLocatiosn() async {
+  Future<Position> getCurrentLocatiosn() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     print("position $position $isLocationServiceEnabled");
+    return position;
   }
 
   getLastKnownPosition() async {
@@ -20,14 +20,13 @@ class Locations {
     print("lastposition $position");
   }
 
-  String getDestanceBetween(double startLatitude, double startLongitude,
-      double endLatitude, double endLongitude) {
+  Future<double> getDestanceBetween(double startLatitude, double startLongitude,
+      double endLatitude, double endLongitude) async {
     double distanceInMeters = Geolocator.distanceBetween(
             startLatitude, startLongitude, endLatitude, endLongitude) /
         1000;
-    String distance = "${distanceInMeters.toStringAsFixed(2)}.Km";
 
-    return distance;
+    return distanceInMeters;
   }
 
   getLocationContenously(String status) async {
@@ -41,7 +40,6 @@ class Locations {
     StreamSubscription<Position> positionStream =
         Geolocator.getPositionStream().listen((Position position) {
       if (position != null) {
-
         FirebaseFirestore.instance
             .collection('locations')
             .doc(auth.currentUser.uid)
@@ -49,27 +47,38 @@ class Locations {
             .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
             // ignore: deprecated_member_use
-            firestore.collection('locations').document(auth.currentUser.uid).update({
+            firestore
+                .collection('locations')
+                .document(auth.currentUser.uid)
+                .update({
               'latitude': position.latitude,
               'longitude': position.longitude,
             });
-          }
-          else{
-            firestore.collection('locations').document(auth.currentUser.uid).set({
+          } else {
+            /* firestore
+                .collection('locations')
+                .document(auth.currentUser.uid)
+                .set({
               'latitude': position.latitude,
               'longitude': position.longitude,
               'uid': auth.currentUser.uid,
-              'orders_number':0 ,
+              
+              'status': "$status"
+            }); */
+            firestore
+                .collection('deliveryBoy_locations')
+                .document(auth.currentUser.uid)
+                .set({
+              'latitude': position.latitude,
+              'longitude': position.longitude,
+              'uid': auth.currentUser.uid,
+              'orders_number': 0,
               'status': "$status"
             });
           }
         });
-
-
-
       }
-        });
-
+    });
   }
 
   Future<String> checkRequestPermission() async {

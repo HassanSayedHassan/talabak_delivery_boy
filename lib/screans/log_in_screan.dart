@@ -4,24 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talabak_delivery_boy/screans/home_page.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
+import 'package:talabak_delivery_boy/webServices/notifications.dart';
+import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:toast/toast.dart';
 
 class LogIn extends StatefulWidget {
-
   @override
   _LogInState createState() => _LogInState();
 }
 
 class _LogInState extends State<LogIn> {
-
   var appcolor = Color(0xFF12c0c7);
   FirebaseAuth auth = FirebaseAuth.instance;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  PostViewModel postViewModel = new PostViewModel();
 
-  TextEditingController EmailControler=TextEditingController();
+  TextEditingController EmailControler = TextEditingController();
 
-  TextEditingController PassControler =TextEditingController();
+  TextEditingController PassControler = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +80,10 @@ class _LogInState extends State<LogIn> {
                 ),
               ],
             ),
-            DrowTextField("phone",Icon(Icons.phone,color: Colors.green),EmailControler),
-            DrowTextField("password",Icon(Icons.lock,color: Colors.green),PassControler),
+            DrowTextField("phone", Icon(Icons.phone, color: Colors.green),
+                EmailControler),
+            DrowTextField("password", Icon(Icons.lock, color: Colors.green),
+                PassControler),
             RaisedButton(
               color: Colors.green,
               child: Text(
@@ -89,26 +92,34 @@ class _LogInState extends State<LogIn> {
               ),
               onPressed: () async {
                 startLoading();
-                var connectivityResult = await (Connectivity().checkConnectivity());
-                if (connectivityResult == ConnectivityResult.mobile||connectivityResult == ConnectivityResult.wifi) {
+                var connectivityResult =
+                    await (Connectivity().checkConnectivity());
+                if (connectivityResult == ConnectivityResult.mobile ||
+                    connectivityResult == ConnectivityResult.wifi) {
                   try {
-                    UserCredential userCredential = await auth
-                        .signInWithEmailAndPassword(
-                        email: '${EmailControler.text}@yahoo.com',
-                        password: PassControler.text
-
-                    ).then((value) {
+                    postViewModel
+                        .login(EmailControler.text, PassControler.text)
+                        .then((value) {
+                      Toast.show(value.status, context);
+                      if (value.status == "success") {
+                        Notifications notifications = new Notifications();
+                        notifications.getPlayerID().then((value) =>
+                            postViewModel
+                                .updateDeliveryBoyData(EmailControler.text,
+                                    PassControler.text, value, '')
+                                .then((value) {
+                              if (value.status == 'registeration success') {
+                                closeLoading();
+                                Navigator.pushAndRemoveUntil(context,
+                                    MaterialPageRoute(builder: (c) {
+                                  return HomeScrean();
+                                }), (route) => false);
+                              }
+                            }));
+                      } else {
                         closeLoading();
-                      Navigator.pushAndRemoveUntil(
-                          context, MaterialPageRoute(builder: (c) {
-                        return HomeScrean();
-                      }), (route) => false);
-
-                      return;
-                      });
-
-
-
+                      }
+                    });
                   } on FirebaseAuthException catch (e) {
                     if (e.code == 'user-not-found') {
                       closeLoading();
@@ -118,41 +129,40 @@ class _LogInState extends State<LogIn> {
                       my_Toast('Wrong password provided for that user.');
                     }
                   }
-                }
-                else{
+                } else {
                   closeLoading();
                   my_Toast('لا يوجد اتصال بالانترنت');
-
                 }
               },
             ),
-            SizedBox(height: 100,),
-
+            SizedBox(
+              height: 100,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget DrowTextField(String label,Icon ico,TextEditingController controler) {
+  Widget DrowTextField(
+      String label, Icon ico, TextEditingController controler) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: TextField(
         controller: controler,
-        obscureText: label=='password'? true:false,
-        keyboardType:TextInputType.emailAddress,
+        obscureText: label == 'password' ? true : false,
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
             icon: ico,
-            enabledBorder:OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.lightGreenAccent , width: 2.0),
+            enabledBorder: OutlineInputBorder(
+              borderSide:
+                  BorderSide(color: Colors.lightGreenAccent, width: 2.0),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.green , width: 2.0),
+              borderSide: BorderSide(color: Colors.green, width: 2.0),
             ),
             labelText: label,
-            labelStyle:TextStyle(color: Colors.green)
-
-        ),
+            labelStyle: TextStyle(color: Colors.green)),
         style: TextStyle(
           color: Colors.black,
           fontSize: 20,
@@ -165,6 +175,7 @@ class _LogInState extends State<LogIn> {
     Toast.show(mess, context,
         duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
   }
+
   void startLoading() {
     showDialog(
       context: context,
@@ -177,7 +188,10 @@ class _LogInState extends State<LogIn> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
-                new CircularProgressIndicator(strokeWidth: 5,backgroundColor: appcolor,),
+                new CircularProgressIndicator(
+                  strokeWidth: 5,
+                  backgroundColor: appcolor,
+                ),
                 new Text("Loading..."),
               ],
             ),
@@ -186,7 +200,8 @@ class _LogInState extends State<LogIn> {
       },
     );
   }
-  void closeLoading(){
+
+  void closeLoading() {
     Navigator.pop(context);
   }
 }

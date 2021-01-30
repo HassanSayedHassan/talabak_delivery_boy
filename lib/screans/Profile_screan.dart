@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_switch/custom_switch.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/Edit_profile.dart';
 import 'package:talabak_delivery_boy/screans/log_in_screan.dart';
+import 'package:talabak_delivery_boy/webServices/locations.dart';
+import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:toast/toast.dart';
-
 
 class Profile_Screan extends StatefulWidget {
   @override
@@ -16,10 +18,18 @@ class Profile_Screan extends StatefulWidget {
 class _Profile_ScreansState extends State<Profile_Screan> {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  var name = '';
+  PostViewModel postViewModel = new PostViewModel();
+  var name = 'hi';
   var profile_image;
   var current_uid;
+  var phone;
+  var playerID;
+  var destance;
+  double long = 0.0;
+  double lat = 0.0;
+  bool status = false;
+  bool inZone = false;
+  Locations locations = new Locations();
 
   SharedPreferences getUserData;
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
@@ -28,6 +38,9 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     getUserData = await preferences;
     setState(() {
       current_uid = getUserData.getString('userID');
+      /* name = getUserData.getString('name'); */
+      playerID = getUserData.getString('playerID');
+      phone = getUserData.getString('phone');
       print("sharePrefrences: $current_uid");
     });
   }
@@ -42,11 +55,30 @@ class _Profile_ScreansState extends State<Profile_Screan> {
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
         setState(() {
-
           name = documentSnapshot.data()["name"];
           profile_image = documentSnapshot.data()["profile_image"];
         });
       }
+    });
+
+    locations.getCurrentLocatiosn().then((value) {
+      locations
+          .getDestanceBetween(
+              value.latitude, value.longitude, 26.3346673, 31.8929298)
+          .then((value) {
+        print('destance: ${value.toStringAsFixed(2)}.KM');
+
+        setState(() {
+          destance = '${value.toStringAsFixed(2)}.KM';
+        });
+        setState(() {
+          if (value > 50.0) {
+            inZone = false;
+          } else {
+            inZone = true;
+          }
+        });
+      });
     });
   }
 
@@ -70,10 +102,48 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                         SizedBox(
                           width: 10,
                         ),
-                        Icon(
-                          Icons.signal_wifi_4_bar,
-                          size: 30,
-                          color: Color(0xFF12c0c7),
+                        CustomSwitch(
+                          activeColor: Colors.green,
+                          value: status,
+                          onChanged: (value) {
+                            print("VALUE : $value");
+                            setState(() {
+                              status = value;
+                            });
+                            locations.getCurrentLocatiosn().then((value) {
+                              locations
+                                  .getDestanceBetween(value.latitude,
+                                      value.longitude, 26.3346673, 31.8929298)
+                                  .then((value) {
+                                print(
+                                    'destance: ${value.toStringAsFixed(2)}.KM');
+
+                                setState(() {
+                                  destance = '${value.toStringAsFixed(2)}.KM';
+                                });
+                                setState(() {
+                                  if (value > 50.0) {
+                                    inZone = false;
+                                  } else {
+                                    inZone = true;
+                                  }
+                                });
+                              });
+                            });
+                            DateTime date = DateTime.now();
+                            postViewModel
+                                .deliveryBoyLogs(
+                                    phone,
+                                    name,
+                                    playerID,
+                                    value.toString(),
+                                    inZone.toString(),
+                                    current_uid,
+                                    destance,
+                                    date.toString())
+                                .then((value) =>
+                                    print('destance::: ${value.playerID}'));
+                          },
                         ),
                         SizedBox(
                           width: 10,
