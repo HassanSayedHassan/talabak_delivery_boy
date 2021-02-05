@@ -4,6 +4,7 @@ class ComplaintModel {
   final String sender;
   final String def;
   final String title;
+  final String date;
 
   final String oederID;
   final String status;
@@ -15,7 +16,8 @@ class ComplaintModel {
       this.oederID,
       this.sender,
       this.title,
-      this.status});
+      this.status,
+      this.date});
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
     return ComplaintModel(
@@ -25,6 +27,7 @@ class ComplaintModel {
         oederID: json['oederID'],
         sender: json['sender'],
         title: json['title'],
+        date: json['date'],
         status: json['status']);
   }
 }

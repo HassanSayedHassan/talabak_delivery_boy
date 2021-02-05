@@ -79,13 +79,14 @@ class PostViewModel {
   }
 
   Future<String> addComplaint(String content, String sender, String def,
-      String title, String orderID) async {
+      String title, String orderID, String date) async {
     var response = await http.post('$baseUrl/complaintsINSERT.php', body: {
       'content': content,
       'sender': sender,
       'def': def,
       'title': title,
-      'orderID': orderID
+      'orderID': orderID,
+      'date': date
     });
 
     if (response.statusCode == 200) {
