@@ -1,5 +1,7 @@
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
+import 'package:talabak_delivery_boy/models/complaintModel.dart';
+import 'package:talabak_delivery_boy/models/rateModel.dart';
 import 'package:talabak_delivery_boy/models/userModel.dart';
 
 import 'package:talabak_delivery_boy/models/deliveryLogs.dart';
@@ -73,6 +75,45 @@ class PostViewModel {
       status = "please check your connection";
       print('register:$status');
       return UserModel.fromJson(convert.json.decode(response.body));
+    }
+  }
+
+  Future<String> addComplaint(String content, String sender, String def,
+      String title, String orderID) async {
+    var response = await http.post('$baseUrl/complaintsINSERT.php', body: {
+      'content': content,
+      'sender': sender,
+      'def': def,
+      'title': title,
+      'orderID': orderID
+    });
+
+    if (response.statusCode == 200) {
+      return ComplaintModel.fromJson(convert.json.decode(response.body)).status;
+    } else {
+      return ComplaintModel.fromJson(convert.json.decode(response.body)).status;
+    }
+  }
+
+  Future<String> addRate(String dboyID, String orderID, String rate) async {
+    var response = await http.post('$baseUrl/rateinsert.php',
+        body: {'dboyID': dboyID, 'orderID': orderID, 'rate': rate});
+
+    if (response.statusCode == 200) {
+      return RateModel.fromJson(convert.json.decode(response.body)).status;
+    } else {
+      return RateModel.fromJson(convert.json.decode(response.body)).status;
+    }
+  }
+
+  Future<String> getDeliveryBoyRate(String dboyid) async {
+    var response =
+        await http.post('$baseUrl/avgrate.php', body: {'dboyID': dboyid});
+
+    if (response.statusCode == 200) {
+      return RateModel.fromJson(convert.json.decode(response.body)).rate;
+    } else {
+      return RateModel.fromJson(convert.json.decode(response.body)).rate;
     }
   }
 
