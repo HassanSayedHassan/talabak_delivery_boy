@@ -108,13 +108,14 @@ class _LogInState extends State<LogIn> {
                                 .updateDeliveryBoyData(EmailControler.text,
                                     PassControler.text, value, '')
                                 .then((value) {
-                              if (value.status == 'registeration success') {
+                                  print("valll  ${value.status}");
+                           ///   if (value.status == 'registeration success') {
                                 closeLoading();
                                 Navigator.pushAndRemoveUntil(context,
                                     MaterialPageRoute(builder: (c) {
                                   return HomeScrean();
                                 }), (route) => false);
-                              }
+                          ///    }
                             }));
                       } else {
                         closeLoading();

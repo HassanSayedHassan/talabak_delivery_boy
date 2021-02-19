@@ -7,6 +7,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:rating_dialog/rating_dialog.dart';
+import 'package:talabak_delivery_boy/aduio_del_user/Drow_Record.dart';
+import 'package:talabak_delivery_boy/aduio_del_user/send_record.dart';
+import 'package:talabak_delivery_boy/screans/show_photo_in_one_screan.dart';
+import 'package:talabak_delivery_boy/utili_class.dart';
+import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:talabak_delivery_boy/widgets/chat_widgets/send_address.dart';
 import 'package:talabak_delivery_boy/widgets/chat_widgets/send_image.dart';
 import 'package:toast/toast.dart';
@@ -28,10 +34,17 @@ class Message_Dilevery_Clint extends StatefulWidget {
 class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var clint_uid;
   var orderId;
+  var discount_pers=20;
+  var total_price=0.0;
+  var actual_price=0.0;
 
   _Message_Dilevery_ClintState(this.clint_uid, this.orderId);
 
+
+
+
   var appcolor = Color(0xFF12c0c7);
+  var appcolor_2=Color(0xFF32065b);
   File Send_Image;
   File reseat_Image;
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -53,6 +66,12 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
 
   bool dis_enable = false;
   bool un_send = false;
+var accept_order;
+var received_time;
+var finish_time;
+  var order_status;
+
+  num cur_orders=0;
 
   @override
   void initState() {
@@ -77,7 +96,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
       if (documentSnapshot.exists) {
         setState(() {
           other_name = documentSnapshot.get('name');
-          other_profile_image = documentSnapshot.get('profile_image');
+         // other_profile_image = documentSnapshot.get('profile_image');
           other_uid = documentSnapshot.get('uid');
 
           var phone= documentSnapshot.get('email').toString().split("@");
@@ -86,25 +105,38 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
         });
       }
     }).then((value) {
+
+
+
+
       firestore
           .collection('orders')
-          .doc(orderId)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
+          .doc(orderId).snapshots().listen((DocumentSnapshot documentSnapshot) {
         if (documentSnapshot.exists) {
           setState(() {
             dis_enable = documentSnapshot.get('dis_enable');
             un_send = documentSnapshot.get('un_send');
+            accept_order=documentSnapshot.get('accept_order');
+
+            received_time=documentSnapshot.get('received_time');
+            finish_time=documentSnapshot.get('finish_time');
+            order_status= documentSnapshot.get('order_status');
+         //   send_time= documentSnapshot.get('send_time');
+           discount_pers=documentSnapshot.get('discount_pers');
           });
         }
-      }).whenComplete(() {
-        setState(() {
-          flag = " ";
-        });
+      });
+
+    }).whenComplete(() {
+      setState(() {
+        flag = " ";
       });
     });
   }
-
+  refresh() {
+    setState(() {});
+    Navigator.pop(context);
+  }
   @override
   Widget build(BuildContext context) {
     return flag == '123'
@@ -177,11 +209,21 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                                   document.data()['sederEmail'],
                                   document.data()['data'],
                                 )
+                              : document.data()['type'] == 'record'
+                              ?  Drow_record(
+                              document.data()['message'],
+                              document.data()['sederEmail'],
+                              document.data()['data'],
+                              current_email
+                          )
                               : document.data()['type'] == 'order'
                                   ? Drow_order(
                                       document.data()['message'],
                                       document.data()['sederEmail'],
                                       document.data()['data'],
+                                     document.data()['resturant_name'],
+                                       document.data()['resturant_longitude'],
+                                     document.data()['resturant_latitude'],
                                     )
                                   : document.data()['type'] == 'end_order'
                                       ? Drow_end_order(
@@ -189,12 +231,34 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                                           document.data()['sederEmail'],
                                           document.data()['data'],
                                         )
+                                            : document.data()['type'] == 'accept_order'
+                                            ? Drow_accept_order(
+                                          document.data()['message'],
+                                          document.data()['sederEmail'],
+                                          document.data()['data'],
+                                        )
+
                                       : document.data()['type'] == 'image'
                                           ? DrowImage(
                                               document.data()['message'],
                                               document.data()['sederEmail'],
                                               document.data()['data'],
                                             )
+                                      : document.data()['type'] ==   'reseat-image'
+                                              ? Drow_reseat_image(
+                                              document.data()['message'],
+                                              document.data()['sederEmail'],
+                                              document.data()['data'],
+                                              document.data()['total_price'],
+                                              document.data()['actual_price'],
+                                              document.data()['dicount_pers'],
+                                              )
+                                              : document.data()['type'] == 'Received_order'
+                                              ? Drow_Received_order(
+                                            document.data()['message'],
+                                            document.data()['sederEmail'],
+                                            document.data()['data'],
+                                          )
                                           : DrowAdress(
                                               document.data()['message'],
                                               document.data()['sederEmail'],
@@ -204,6 +268,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                       ),
                     ),
                     Align(
+
                       alignment: Alignment.bottomRight,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -212,7 +277,8 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                               ? SendImage(orderId, current_email)
                               : SizedBox(),
                           dis_enable == false
-                              ? Send_Address(orderId, current_email)
+                              ? SendRecord(orderId,current_email,
+                other_name,other_uid,other_profile_image, notifyParent: refresh )
                               : SizedBox(),
                           dis_enable == false
                               ? Expanded(
@@ -238,7 +304,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                                     ),
                                   ),
                                 )
-                              : un_send == true ? un_send_widget() : SizedBox(),
+                              : un_send == true ? un_send_widget() : compleate_order_widget(),
                           dis_enable == false
                               ? IconButton(
                                   icon: Icon(Icons.send),
@@ -334,7 +400,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: senderEmail == current_email ? appcolor : Colors.white,
+                color:  Colors.green,
               ),
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: Column(
@@ -369,6 +435,337 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   }
 
   Widget DrowImage(message, senderEmail, data) {
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (c) {
+          return show_photo_in_one_screan(message);}));
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: senderEmail == current_email
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Material(
+              borderRadius: BorderRadius.circular(10),
+              elevation: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: senderEmail == current_email ? appcolor : Colors.white,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 300,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(message),
+                          fit: BoxFit.fill,
+                        ),
+                        //shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      getdata(data),
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget Drow_reseat_image(message, senderEmail, data,total_price,actual_price,dicount_pers) {
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (c) {
+          return show_photo_in_one_screan(message);}));
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: senderEmail == current_email
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Material(
+              borderRadius: BorderRadius.circular(10),
+              elevation: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: senderEmail == current_email ? appcolor : Colors.white,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 300,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(message),
+                          fit: BoxFit.fill,
+                        ),
+                        //shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "المبلغ الكلي = ${total_price }",
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 20),
+                    ), SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "سعر التوصيل  = 12.0",
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "نسبه الخصم = ${dicount_pers }",
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      " المبلغ بعد الخصم = ${actual_price }",
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      getdata(data),
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+
+  Widget un_send_widget() {
+    return Expanded(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+        child: Column(
+          children: [
+            Material(
+              borderRadius: BorderRadius.circular(10),
+              elevation: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                      ),
+                      child: Text(
+                        'طلب ملغي ',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget Drow_order(message, sender_email, data, resturant_name, resturant_longitude, resturant_latitude) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: sender_email == current_email
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          Material(
+            borderRadius: BorderRadius.circular(10),
+            elevation: 5,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.pinkAccent,
+              ),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'طلــــــــب جديــــد',
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.pinkAccent,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Flexible(
+                                child: Text(
+                                  'إسم المطعــــــــــــم',
+                                  style:
+                                  TextStyle(fontSize: 18, color: Colors.black),
+                                )),
+                            InkWell(
+                                onTap: (){
+                                  if (resturant_longitude != null && resturant_latitude != null) {
+                                    _launchURL(
+                                        'http://maps.google.com/maps?q=${resturant_longitude},${resturant_latitude}+(My+Point)&z=16&ll=${resturant_longitude},${resturant_latitude}');
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: Colors.pinkAccent,
+                                  size: 38,
+                                ))
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    getdata(data),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget compleate_order_widget() {
+    return Expanded(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+        child: Column(
+          children: [
+            Material(
+              borderRadius: BorderRadius.circular(10),
+              elevation: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.green,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.green,
+                      ),
+                      child: Text(
+                        'طلب مكتمل  ',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget Drow_Received_order(message, senderEmail, data) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
       child: Column(
@@ -381,33 +778,29 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
             borderRadius: BorderRadius.circular(10),
             elevation: 5,
             child: Container(
+              //height: 100,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: senderEmail == current_email ? appcolor : Colors.white,
+                color: Colors.blue,
               ),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    height: 300,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(message),
-                        fit: BoxFit.fill,
-                      ),
-                      //shape: BoxShape.circle,
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
                     ),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 5,
                   ),
                   Text(
                     getdata(data),
                     style: TextStyle(
-                        color: senderEmail == current_email
-                            ? Colors.white
-                            : appcolor,
+                        color: Colors.white,
                         fontSize: 12),
                   ),
                 ],
@@ -417,11 +810,6 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
         ],
       ),
     );
-  }
-
-  String getdata(data) {
-    DateTime todayDate = DateTime.parse(data);
-    return DateFormat("yyyy/MM/dd                hh:mm").format(todayDate);
   }
 
   Widget DrowAdress(message, senderEmail, data) {
@@ -492,6 +880,59 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
     );
   }
 
+  Widget Drow_accept_order(message, senderEmail, data) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: senderEmail == current_email
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          Material(
+            borderRadius: BorderRadius.circular(10),
+            elevation: 5,
+            child: Container(
+              //height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: appcolor_2,
+              ),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: senderEmail == current_email
+                          ? Colors.white
+                          : appcolor,
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    getdata(data),
+                    style: TextStyle(
+                        color: senderEmail == current_email
+                            ? Colors.white
+                            : appcolor,
+                        fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
   _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -525,110 +966,9 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
     );
   }
 
-  Widget un_send_widget() {
-    return Expanded(
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
-        child: Column(
-          children: [
-            Material(
-              borderRadius: BorderRadius.circular(10),
-              elevation: 5,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                      ),
-                      child: Text(
-                        'طلب ملغي ',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget Drow_order(message, sender_email, data) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: sender_email == current_email
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
-        children: [
-          Material(
-            borderRadius: BorderRadius.circular(10),
-            elevation: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: sender_email == current_email ? appcolor : Colors.white,
-              ),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: sender_email == current_email
-                          ? Colors.white
-                          : appcolor,
-                    ),
-                    child: Text(
-                      'طلــــــــب جديــــد',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      color: sender_email == current_email
-                          ? Colors.white
-                          : appcolor,
-                      fontSize: 20,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    getdata(data),
-                    style: TextStyle(
-                        color: sender_email == current_email
-                            ? Colors.white
-                            : appcolor,
-                        fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  String getdata(data) {
+    DateTime todayDate = DateTime.parse(data);
+    return DateFormat("yyyy/MM/dd                hh:mm").format(todayDate);
   }
 
   send_complain() {
@@ -672,7 +1012,22 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                   ),
                 ),
                 color: appcolor,
-                onPressed: () {},
+                onPressed: () {
+                  HelpFun().startLoading(context);
+                  PostViewModel postViewModel = new PostViewModel();
+                  postViewModel.addComplaint(
+                      coplainControler.text.toString(),
+                      current_uid,
+                      other_uid,
+                      "user",
+                      orderId,
+                      DateTime.now().toIso8601String().toString()).then((value) {
+                        HelpFun().closeLoading(context);
+                        HelpFun().my_Toast("تم إرسال الشكوي", context);
+                        Navigator.pop(context);
+
+                  });
+                },
               ),
             ],
           ),
@@ -690,20 +1045,21 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
         take_resrat();
       }
     } else if (choice == Constants.end_order) {
-      if (dis_enable == false) {
-        firestore.collection('orders').doc(orderId).collection('messages').add({
-          'message': 'تم انهاء الطلب',
-          'type': 'end_order',
-          'data': DateTime.now().toIso8601String().toString(),
-          'sederEmail': current_email,
-        }).whenComplete(() {});
-      }
+        _finish_order_fun();
     }
+    else if (choice == Constants.accept_order){
+      _accept_order_fun();
+    }
+    else if (choice == Constants.share_loc){
+      Send_Address(orderId,current_email,context).fun_send_address();
+    }
+
+
   }
 
   Future<void> take_resrat() async {
     final pickedImageFile = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 40);
+        source: ImageSource.gallery, imageQuality: 40);
     if (pickedImageFile != null) {
       setState(() {
         reseat_Image = pickedImageFile;
@@ -724,9 +1080,21 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                     children: [
                       TextField(
                         // maxLines: 6,
-                        // keyboardType: TextInputType.multiline,
+                         keyboardType: TextInputType.number,
                         controller: priseControler,
+                        onChanged: (val){
+                          setState(() {
+                               print(int.parse(priseControler.text.toString()));
+                             var  total_dic= (discount_pers/100)* int.parse(priseControler.text.toString());
+
+                               total_price=double.parse(priseControler.text.toString());
+                               actual_price =double.parse(priseControler.text.toString())-total_dic+12;
+                           //  print(total_price);
+                          });
+
+                        },
                         decoration: InputDecoration(
+                          prefix: Text("جنيه مصري"),
                           hintText: 'أدخل السعر ',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: appcolor, width: 2.0),
@@ -742,6 +1110,11 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                         ),
                         textAlign: TextAlign.end,
                       ),
+                      SizedBox(height: 10,),
+                      Text(" نسبه الخصم =  ${ discount_pers}"),
+                     // SizedBox(height: 10,),
+                   //   Text(" السعر الكلي  =  ${total_price}"),
+
                       RaisedButton(
                         onPressed: () {
                           uploadIage(reseat_Image);
@@ -798,6 +1171,9 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
       firestore.collection('orders').doc(orderId).collection('messages').add({
         'message': url,
         'type': 'reseat-image',
+        'total_price':total_price,
+        'dicount_pers':discount_pers,
+        'actual_price':actual_price,
         'data': DateTime.now().toIso8601String().toString(),
         'sederEmail': current_email,
       }).then((value) {
@@ -830,16 +1206,137 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
       return false;
     }
   }
+
+
+  void _accept_order_fun() {
+    if(un_send==false&&accept_order==""){
+      firestore
+          .collection('orders')
+          .doc(orderId)
+          .collection('messages')
+          .add({
+        'message': "تم قبول الطلب",
+        'type': 'accept_order',
+        'data': DateTime.now()
+            .toIso8601String()
+            .toString(),
+        'sederEmail': current_email,
+      }).whenComplete(() {
+        firestore
+            .collection('orders')
+            .doc(orderId).update({
+          "order_status": 2,
+          "accept_order":DateTime.now()
+              .toIso8601String()
+              .toString()
+        }).whenComplete(() {
+          firestore
+              .collection('delivery_boys')
+              .doc(current_uid).get().then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+          setState(() {
+            cur_orders = documentSnapshot.get('current_orders');
+          });
+          }
+          });
+
+        }).whenComplete(() {
+          firestore
+              .collection('delivery_boys')
+              .doc(current_uid).update({
+            "current_orders": cur_orders+1,
+          });
+        });
+      });
+
+
+    }
+  }
+
+  void _finish_order_fun() {
+    if (dis_enable == false&&accept_order!=""&&received_time!=""&&finish_time=="") {
+      firestore.collection('orders').doc(orderId).collection('messages').add({
+        'message': 'تم انهاء الطلب',
+        'type': 'end_order',
+        'data': DateTime.now().toIso8601String().toString(),
+        'sederEmail': current_email,
+      }).whenComplete(() {
+        firestore
+            .collection('orders')
+            .doc(orderId).update({
+          "order_status": 4,
+          "dis_enable":true,
+          "finish_time":DateTime.now()
+              .toIso8601String()
+              .toString()
+        }).whenComplete(() {
+          _Show_rates_dialog();
+        });
+
+      }).whenComplete(() {
+        firestore
+            .collection('delivery_boys')
+            .doc(current_uid).get().then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            setState(() {
+              cur_orders = documentSnapshot.get('current_orders');
+            });
+          }
+        });
+
+      }).whenComplete(() {
+        firestore
+            .collection('delivery_boys')
+            .doc(current_uid).update({
+          "current_orders": cur_orders-1,
+        });
+      });
+    }
+  }
+  void _Show_rates_dialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: true, // set to false if you want to force a rating
+        builder: (context) {
+          return RatingDialog(
+            icon: const FlutterLogo(
+                size: 100,
+                colors: Colors.red), // set your own image/icon widget
+            title: "برجاء تقييم العميل ",
+            description:
+            "",
+            submitButton: "تقييم",
+            alternativeButton: "اغلاق", // optional
+            positiveComment: "", // optional
+            negativeComment: "", // optional
+            accentColor: appcolor, // optional
+            onSubmitPressed: (int rating) {
+              print("onSubmitPressed: rating = $rating");
+              // TODO: open the app's page on Google Play / Apple App Store
+            },
+            onAlternativePressed: () {
+              Navigator.pop(context);
+              print("onAlternativePressed: do something");
+              // TODO: maybe you want the user to contact you instead of rating a bad review
+            },
+          );
+        });
+  }
 }
 
 class Constants {
   static const String send_comp = 'ارسال شكوي';
   static const String send_reseat = 'ارسال الفاتوره';
-  static const String end_order = 'انهاء الطلب';
+  static const String share_loc = 'مشاركة الموقع';
+  static const String end_order = 'تم توصيل الطلب';
+
+  static const String accept_order = 'قبول الطلب';
 
   static const List<String> choices = <String>[
     send_comp,
     send_reseat,
-    end_order
+    end_order,
+    accept_order,
+    share_loc
   ];
 }

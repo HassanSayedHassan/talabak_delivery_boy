@@ -46,10 +46,25 @@ dependencies:
   easy_localization:
   http: ^0.12.2
   convert: ^2.1.1
-  flutter_map: any
   custom_switch: ^0.0.1
-  flutter_pin_code_fields: ^1.1.0
+  flutter_map: any
   onesignal_flutter: ^2.6.1
+  flutter_pin_code_fields: ^1.1.0
+  page_view_indicators:
+  rating_dialog:
+  cached_network_image:
+  photo_view:
+  path_provider:
+  permission_handler:
+  assets_audio_player:
+
+  flutter_launcher_icons:
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
 
 dev_dependencies:
   flutter_test:

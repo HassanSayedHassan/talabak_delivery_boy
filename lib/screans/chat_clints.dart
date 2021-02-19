@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Message_page_clint_dileveryboy.dart';
 
@@ -14,21 +15,23 @@ class Chat_With_Clints extends StatefulWidget {
 }
 
 class _Chat_With_ClintsState extends State<Chat_With_Clints> {
-  FirebaseAuth auth = FirebaseAuth.instance;
+  //FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('orders');
 
   var appcolor=Color(0xFF12c0c7);
   List<String> my_orders=[];
 
-
+  var current_uid;
   getshareschat() async{
-
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //name= prefs.getString( 'name' );
+    current_uid = prefs.getString( 'userID' );
     //final QuerySnapshot result =
     await FirebaseFirestore.instance.collection('orders') .get()
         .then((QuerySnapshot querySnapshot) => {
       querySnapshot.docs.forEach((doc) {
-        if(doc["received_uid"]==auth.currentUser.uid){
+        if(doc["received_uid"]==current_uid){
           setState(() {
             my_orders.add(doc.id);
           });
@@ -121,7 +124,7 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      order_status,
+                      get_order_status(order_status),
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.black26,
@@ -149,5 +152,21 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
     DateTime todayDate = DateTime.parse(data);
     return DateFormat("yyyy/MM/dd   hh:mm").format(todayDate);
   }
-
+  String get_order_status(order_status){
+    if(order_status==0) {
+      return "تم الإلغاء";
+    }
+    if(order_status==1) {
+      return "تم الارسال";
+    }
+    if(order_status==2) {
+      return "تم القبول";
+    }
+    if(order_status==3) {
+      return "تم الاستلام";
+    }
+    if(order_status==4) {
+      return "تم التوصيل";
+    }
+  }
 }

@@ -19,7 +19,7 @@ class Profile_Screan extends StatefulWidget {
 }
 
 class _Profile_ScreansState extends State<Profile_Screan> {
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   PostViewModel postViewModel = new PostViewModel();
   var name = 'hi';
@@ -35,19 +35,13 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   bool beOffline = false;
   Locations locations = new Locations();
 
+  var my_orders_number=0;
+
+
   SharedPreferences getUserData;
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
 
-  void pref() async {
-    getUserData = await preferences;
-    setState(() {
-      current_uid = getUserData.getString('userID');
-      /* name = getUserData.getString('name'); */
-      playerID = getUserData.getString('playerID');
-      phone = getUserData.getString('phone');
-      print("sharePrefrences: $current_uid");
-    });
-  }
+
 
   getLocationContenously() async {
     SharedPreferences getUserID;
@@ -91,21 +85,52 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     }
   }
 
+  get_current_user() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //name= prefs.getString( 'name' );
+    current_uid = prefs.getString( 'userID' );
+    //profile_image= prefs.getString( 'email' );
+
+    FirebaseFirestore.instance
+        .collection('orders')
+        .get()
+        .then((QuerySnapshot querySnapshot) =>
+    {
+      querySnapshot.docs.forEach((doc) {
+        if (doc["sender_uid"] == current_uid && doc["order_status"] == 4) {
+          my_orders_number++;
+          print(my_orders_number);
+        }
+      })
+    })
+        .whenComplete(() {
+
+      FirebaseFirestore.instance
+          .collection('delivery_boys')
+          .doc(current_uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          setState(() {
+            name = documentSnapshot.data()["name"];
+            profile_image = documentSnapshot.data()["imageUrl"];
+          });
+        }
+      });
+
+    });
+    postViewModel.getDeliveryBoyRate(current_uid).then((value) {
+      print("ratesss   ${ value.toString()}");
+
+    });
+
+  }
+
+//myinit_stat(){}
   @override
   void initState() {
-    pref();
-    FirebaseFirestore.instance
-        .collection('delivery_boys')
-        .doc(auth.currentUser.uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        setState(() {
-          name = documentSnapshot.data()["name"];
-          profile_image = documentSnapshot.data()["profile_image"];
-        });
-      }
-    });
+    get_current_user();
+
     getLocationContenously();
     locations.getCurrentLocatiosn().then((value) {
       locations
@@ -267,7 +292,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   onPressed: () {
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(builder: (c) {
-                                      return EditProfile();
+                                      return EditProfile(current_uid);
                                     }));
                                   }),
                             ),
@@ -288,10 +313,8 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                   SizedBox(
                     height: 10,
                   ),
-                  DrowListItem('عدد الطلبات', '620', Icons.directions_car),
+                  DrowListItem('عدد الطلبات',my_orders_number.toString(), Icons.directions_car),
                   DrowListItem('تقييمات الخدمات', '4', Icons.star),
-                  DrowListItem('ملاحظات المستخدمين', '220', Icons.chat),
-                  DrowListItem('الاعدادات', '', Icons.settings),
                   DrowListItem('تسجيل الخروج', '', Icons.arrow_back),
                 ],
               ),
@@ -302,11 +325,32 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     );
   }
 
+  del_boy_off(uid){
+    firestore.collection('delivery_boys').doc(uid).update(
+        {
+          "status":false,
+        }).whenComplete(() {
+      setState(() {
+    //    _swich = val;
+      });
+    });
+  }
+  del_boy_on(uid){
+    firestore.collection('delivery_boys').doc(uid).update(
+        {
+          "status":true,
+        }).whenComplete(() {
+      setState(() {
+        //    _swich = val;
+      });
+    });
+  }
+
   Widget DrowListItem(String title, String number, IconData ico) {
     return InkWell(
       onTap: () {
         if (title == 'تسجيل الخروج') {
-          auth.signOut();
+         // auth.signOut();
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (c) {
             return LogIn();
           }), (route) => false);

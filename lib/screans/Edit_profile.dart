@@ -7,14 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:talabak_delivery_boy/utili_class.dart';
 
 class EditProfile extends StatefulWidget {
+  var del_uid;
+
+  EditProfile(this.del_uid);
+
   @override
   _EditProfileState createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -35,10 +40,10 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   void initState() {
-    pref();
+
     FirebaseFirestore.instance
         .collection('users')
-        .doc(auth.currentUser.uid)
+        .doc(widget.del_uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
@@ -51,16 +56,21 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   uploadImage(File image) async {
+
     StorageReference firebaseStorageRef = FirebaseStorage.instance
         .ref()
-        .child('profile_images').child(auth.currentUser.uid).child('image');
+        .child('profile_images').child(widget.del_uid).child('image');
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(image);
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
     final url = await firebaseStorageRef.getDownloadURL();
 
-    await firestore.collection('delivery_boys').doc(auth.currentUser.uid).update({
-      'profile_image': url,
-    }).then((value) => print("value: $url"));
+    await firestore.collection('delivery_boys').doc(widget.del_uid).update({
+      'imageUrl': url,
+    }).whenComplete(() {
+      HelpFun().closeLoading(context);
+      HelpFun().my_Toast("تم تحدث الصورة", context);
+      print("value: $url");
+    });
   }
 
   void _pickSmallImage() async {
@@ -117,8 +127,9 @@ class _EditProfileState extends State<EditProfile> {
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 50),
                 onPressed: () {
                   if (_pickedProfilePhoto != null) {
+                    HelpFun().startLoading(context);
                     uploadImage(_pickedProfilePhoto);
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
                   }
                 })
           ],

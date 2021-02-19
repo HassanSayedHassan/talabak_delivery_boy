@@ -4,20 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:talabak_delivery_boy/utili_class.dart';
 import 'package:toast/toast.dart';
-class Send_Address extends StatefulWidget {
-  var channelId,current_email;
- Send_Address(this.channelId,this.current_email);
 
-  @override
-  _Send_AddressState createState() => _Send_AddressState(channelId,current_email);
-}
 
-class _Send_AddressState extends State<Send_Address> {
+class Send_Address  {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var channelId,current_email;
-  _Send_AddressState(this.channelId,this.current_email);
+  var channelId,current_email,context;
+  Send_Address(this.channelId,this.current_email,this.context);
   var appcolor = Color(0xFF12c0c7);
 
   Position position;
@@ -30,8 +25,7 @@ class _Send_AddressState extends State<Send_Address> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       closeLoading();
-      Toast.show("من فضلك قم بتفعيل خدمة تحديد المكان", context,
-          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+      HelpFun().my_Toast("من فضلك قم بتفعيل خدمة تحديد المكان", context);
       return Future.error('Location services are disabled.');
 
     }
@@ -59,77 +53,70 @@ class _Send_AddressState extends State<Send_Address> {
 
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        icon: Icon(Icons.location_on),
-        color: appcolor,
-        iconSize: 40,
-        onPressed: () {
-          _determinePosition().then((value) {
-            if (position.longitude.toString().isNotEmpty && position.latitude.toString().isNotEmpty) {
-              closeLoading();
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Center(
-                      child: Container(
-                        color: appcolor,
-                        width: 300,
-                        height: 300,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset('assets/images/gmap.png'),
-                            RaisedButton.icon(
-                              icon: Text('Shere Your Location'),
-                              label: Icon(Icons.send,color: appcolor,size: 40,),
-                              color: Colors.white,
-                              elevation: 10,
-                              onPressed: () async {
-                                var stats = false;
-                                var connectivityResult = await (Connectivity()
-                                    .checkConnectivity());
-                                if (connectivityResult ==
-                                    ConnectivityResult.mobile) {
-                                  stats = true;
-                                } else if (connectivityResult ==
-                                    ConnectivityResult.wifi) {
-                                  stats = true;
-                                }
-                                if (stats) {
-                                  firestore.collection('orders')
-                                      .doc(channelId)
-                                      .collection('messages')
-                                      .add({
-                                    'message':
-                                    "${position.longitude.toString()}" +
-                                        " " +
-                                        "${position.latitude.toString()}",
-                                    'type': 'address',
-                                    'data': DateTime.now()
-                                        .toIso8601String()
-                                        .toString(),
-                                    'sederEmail': widget.current_email,
-                                  }).then((value) =>
-                                      Navigator.of(context).pop());
-                                }
-                                else {
-                                  closeLoading();
-                                  my_Toast('تأكد من الاتصال بالنترنت');
-                                }
-                              },
-                            ),
-                          ],
-
-                        ),
+  fun_send_address () {
+    _determinePosition().then((value) {
+      if (position.longitude.toString().isNotEmpty && position.latitude.toString().isNotEmpty) {
+        closeLoading();
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Center(
+                child: Container(
+                  color: appcolor,
+                  width: 300,
+                  height: 300,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/gmap.png'),
+                      RaisedButton.icon(
+                        icon: Text('Shere Your Location'),
+                        label: Icon(Icons.send,color: appcolor,size: 40,),
+                        color: Colors.white,
+                        elevation: 10,
+                        onPressed: () async {
+                          var stats = false;
+                          var connectivityResult = await (Connectivity()
+                              .checkConnectivity());
+                          if (connectivityResult ==
+                              ConnectivityResult.mobile) {
+                            stats = true;
+                          } else if (connectivityResult ==
+                              ConnectivityResult.wifi) {
+                            stats = true;
+                          }
+                          if (stats) {
+                            firestore.collection('orders')
+                                .doc(channelId)
+                                .collection('messages')
+                                .add({
+                              'message':
+                              "${position.longitude.toString()}" +
+                                  " " +
+                                  "${position.latitude.toString()}",
+                              'type': 'address',
+                              'data': DateTime.now()
+                                  .toIso8601String()
+                                  .toString(),
+                              'sederEmail': current_email,
+                            }).then((value) =>
+                                Navigator.of(context).pop());
+                          }
+                          else {
+                            closeLoading();
+                            my_Toast('تأكد من الاتصال بالنترنت');
+                          }
+                        },
                       ),
-                    );
-                  });
-            }
-          });
+                    ],
 
-        });
+                  ),
+                ),
+              );
+            });
+      }
+    });
+
   }
 
   void startLoading() {

@@ -54,6 +54,7 @@ class Locations {
               'latitude': position.latitude,
               'longitude': position.longitude,
             });
+
           } else {
             /* firestore
                 .collection('locations')
