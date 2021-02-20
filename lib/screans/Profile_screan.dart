@@ -348,12 +348,16 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
   Widget DrowListItem(String title, String number, IconData ico) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (title == 'تسجيل الخروج') {
-         // auth.signOut();
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (c) {
-            return LogIn();
-          }), (route) => false);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('name',"").whenComplete(() {
+            print(prefs.getString('name'));
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (c) {
+              return LogIn();}), (route) => false);
+          });
+
+
 
           Toast.show("تم تسجيل الخروج", context,
               duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:talabak_delivery_boy/webServices/notifications.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -20,8 +21,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Notifications notifications;
+  var current_name;
+
+  Future check_current_user() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    current_name = prefs.getString( 'name' );
+  }
+
   @override
-  void initState() {
+  Future<void> initState()  {
+    check_current_user();
+
     notifications = new Notifications();
     OneSignal.shared.init("3bf052b4-bda6-4553-bd78-118ea7909359", iOSSettings: {
       OSiOSSettings.autoPrompt: false,
@@ -40,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Your Order',
       home: MyApplication(
-        app: LogIn(),
+        app: current_name==""? LogIn():HomeScrean(),
       ),
       routes: {
         'homeScrean': (context) => new HomeScrean(),

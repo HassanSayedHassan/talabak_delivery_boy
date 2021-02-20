@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Locations {
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
   Future<Position> getCurrentLocatiosn() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -32,53 +32,42 @@ class Locations {
   getLocationContenously(String status) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    SharedPreferences getUserID;
-    Future<SharedPreferences> preferences = SharedPreferences.getInstance();
-    getUserID = await preferences;
-    String userID = getUserID.getString("userID");
 
-    StreamSubscription<Position> positionStream =
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userID = prefs.getString("userID");
+
+   /// StreamSubscription<Position> positionStream =
+    ///  29.3083333
+    /// 30.8447222
         Geolocator.getPositionStream().listen((Position position) {
-      if (position != null) {
-        FirebaseFirestore.instance
-            .collection('locations')
-            .doc(auth.currentUser.uid)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            // ignore: deprecated_member_use
-            firestore
+          if (position != null) {
+            var distance=Geolocator.distanceBetween(position.latitude, position.longitude,29.3083333, 30.8447222);
+            print("distance    $distance");
+           // if(distance>2500){
+              /// out of zoon
+        //    }
+            FirebaseFirestore.instance
                 .collection('locations')
-                .document(auth.currentUser.uid)
-                .update({
-              'latitude': position.latitude,
-              'longitude': position.longitude,
+                .doc(userID)
+                .get()
+                .then((DocumentSnapshot documentSnapshot) {
+              if (documentSnapshot.exists) {
+                // ignore: deprecated_member_use
+                firestore.collection('locations').doc(userID).update({
+                  'latitude': position.latitude,
+                  'longitude': position.longitude,
+                });
+              }
+              else{
+                firestore.collection('locations') .doc(userID).set({
+                  'latitude': position.latitude,
+                  'longitude': position.longitude,
+                });
+              }
             });
 
-          } else {
-            /* firestore
-                .collection('locations')
-                .document(auth.currentUser.uid)
-                .set({
-              'latitude': position.latitude,
-              'longitude': position.longitude,
-              'uid': auth.currentUser.uid,
-              
-              'status': "$status"
-            }); */
-            firestore
-                .collection('deliveryBoy_locations')
-                .document(auth.currentUser.uid)
-                .set({
-              'latitude': position.latitude,
-              'longitude': position.longitude,
-              'uid': auth.currentUser.uid,
-              'orders_number': 0,
-              'status': "$status"
-            });
+
           }
-        });
-      }
     });
   }
 
