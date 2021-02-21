@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:rating_dialog/rating_dialog.dart';
-import 'package:talabak_delivery_boy/aduio_del_user/Drow_Record.dart';
-import 'package:talabak_delivery_boy/aduio_del_user/send_record.dart';
 import 'package:talabak_delivery_boy/screans/show_photo_in_one_screan.dart';
 import 'package:talabak_delivery_boy/utili_class.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
@@ -209,11 +207,11 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                                   document.data()['data'],
                                 )
                               : document.data()['type'] == 'record'
-                                  ? Drow_record(
+                                  ? DrowMessage(
                                       document.data()['message'],
                                       document.data()['sederEmail'],
                                       document.data()['data'],
-                                      current_email)
+                                      )
                                   : document.data()['type'] == 'order'
                                       ? Drow_order(
                                           document.data()['message'],
@@ -291,11 +289,6 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
                         children: [
                           dis_enable == false
                               ? SendImage(orderId, current_email)
-                              : SizedBox(),
-                          dis_enable == false
-                              ? SendRecord(orderId, current_email, other_name,
-                                  other_uid, other_profile_image,
-                                  notifyParent: refresh)
                               : SizedBox(),
                           dis_enable == false
                               ? Expanded(
