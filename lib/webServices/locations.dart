@@ -36,6 +36,7 @@ class Locations {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userID = prefs.getString("userID");
     String name = prefs.getString("name");
+    String current_uid = prefs.getString('userID');
     String playerID = prefs.getString("playerID");
     String phone = prefs.getString("phone");
 
@@ -55,6 +56,8 @@ class Locations {
 
           postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
               'false', userID, distance.toString(), date.toString());
+
+          del_boy_off(current_uid);
         }
         FirebaseFirestore.instance
             .collection('locations')
@@ -115,5 +118,11 @@ class Locations {
 
   openlocationSetting() async {
     await Geolocator.openLocationSettings();
+  }
+  del_boy_off(uid) {
+    FirebaseFirestore.instance.collection('delivery_boys').doc(uid).update({
+      "status": false,
+    }).whenComplete(() {
+    });
   }
 }
