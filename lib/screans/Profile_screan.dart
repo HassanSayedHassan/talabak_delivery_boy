@@ -96,9 +96,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   @override
   void initState() {
     get_current_user();
-    deliveryTime.getDeliveryTime(current_uid).then((value) {
-      //true or false if user in scadule
-    });
+
   }
 
   @override
@@ -126,22 +124,29 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                           value: status,
                           onChanged: (value) {
                             print("VALUE : $value");
-                            setState(() {
-                              status = value;
-                            });
                             if (value) {
                               PostViewModel postViewModel = new PostViewModel();
-                              DateTime date = DateTime.now();
+                              deliveryTime.getDeliveryTime(current_uid).then((in_time) {
+                                print("in_timeeee   $in_time");
+                               if(!in_time){
+                                  print("currennnt  $current_uid");
+                                 DateTime date = DateTime.now();
+                                 postViewModel.deliveryBoyLogs(
+                                     phone,
+                                     name,
+                                     playerID,
+                                     'online',
+                                     'true',
+                                     userID,
+                                     'in zone',
+                                     date.toString());
+                                 del_boy_on(current_uid);
+                                 setState(() {
+                                   status = value;
+                                 });
+                               }
+                              });
 
-                              postViewModel.deliveryBoyLogs(
-                                  phone,
-                                  name,
-                                  playerID,
-                                  'online',
-                                  'true',
-                                  userID,
-                                  'in zone',
-                                  date.toString());
                             } else {
                               PostViewModel postViewModel = new PostViewModel();
                               DateTime date = DateTime.now();
@@ -155,6 +160,10 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   userID,
                                   'in zone',
                                   date.toString());
+                              del_boy_off(current_uid);
+                              setState(() {
+                                status = value;
+                              });
                             }
                           },
                         ),

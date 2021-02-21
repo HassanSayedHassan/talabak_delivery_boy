@@ -47,7 +47,7 @@ class Locations {
         var distance = Geolocator.distanceBetween(
             position.latitude, position.longitude, 29.3083333, 30.8447222);
         print("distance    $distance");
-        if (distance > 2500) {
+        if (distance > 25000) {
           /// out of zoon
           ///
           PostViewModel postViewModel = new PostViewModel();
