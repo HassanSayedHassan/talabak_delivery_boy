@@ -23,12 +23,12 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   PostViewModel postViewModel = new PostViewModel();
-  var name = 'hi';
-  var profile_image;
-  var current_uid;
-  var phone;
-  var playerID;
-  var destance;
+  String name = 'hi';
+  String profile_image;
+  String current_uid;
+  String phone;
+  String playerID;
+  String destance;
   double long = 0.0;
   double lat = 0.0;
   bool status = false;
@@ -96,7 +96,6 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   @override
   void initState() {
     get_current_user();
-
   }
 
   @override
@@ -126,27 +125,32 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                             print("VALUE : $value");
                             if (value) {
                               PostViewModel postViewModel = new PostViewModel();
-                              deliveryTime.getDeliveryTime(current_uid).then((in_time) {
+                              deliveryTime
+                                  .getDeliveryTime(current_uid)
+                                  .then((in_time) {
                                 print("in_timeeee   $in_time");
-                               if(!in_time){
+                                if (!in_time) {
                                   print("currennnt  $current_uid");
-                                 DateTime date = DateTime.now();
-                                 postViewModel.deliveryBoyLogs(
-                                     phone,
-                                     name,
-                                     playerID,
-                                     'online',
-                                     'true',
-                                     userID,
-                                     'in zone',
-                                     date.toString());
-                                 del_boy_on(current_uid);
-                                 setState(() {
-                                   status = value;
-                                 });
-                               }
+                                  DateTime date = DateTime.now();
+                                  postViewModel
+                                      .deliveryBoyLogs(
+                                          phone,
+                                          name,
+                                          playerID,
+                                          'online',
+                                          'true',
+                                          current_uid,
+                                          'in zone',
+                                          date.toString())
+                                      .then((value) {
+                                    print('currennnt:: ${value.status}');
+                                  });
+                                  del_boy_on(current_uid);
+                                  setState(() {
+                                    status = value;
+                                  });
+                                }
                               });
-
                             } else {
                               PostViewModel postViewModel = new PostViewModel();
                               DateTime date = DateTime.now();

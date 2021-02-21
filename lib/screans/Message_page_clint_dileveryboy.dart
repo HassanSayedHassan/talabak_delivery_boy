@@ -34,17 +34,14 @@ class Message_Dilevery_Clint extends StatefulWidget {
 class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var clint_uid;
   var orderId;
-  var discount_pers=20;
-  var total_price=0.0;
-  var actual_price=0.0;
+  var discount_pers = 20;
+  var total_price = 0.0;
+  var actual_price = 0.0;
 
   _Message_Dilevery_ClintState(this.clint_uid, this.orderId);
 
-
-
-
   var appcolor = Color(0xFF12c0c7);
-  var appcolor_2=Color(0xFF32065b);
+  var appcolor_2 = Color(0xFF32065b);
   File Send_Image;
   File reseat_Image;
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -66,12 +63,12 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
 
   bool dis_enable = false;
   bool un_send = false;
-var accept_order;
-var received_time;
-var finish_time;
+  var accept_order;
+  var received_time;
+  var finish_time;
   var order_status;
 
-  num cur_orders=0;
+  num cur_orders = 0;
 
   @override
   void initState() {
@@ -96,47 +93,46 @@ var finish_time;
       if (documentSnapshot.exists) {
         setState(() {
           other_name = documentSnapshot.get('name');
-         // other_profile_image = documentSnapshot.get('profile_image');
+          // other_profile_image = documentSnapshot.get('profile_image');
           other_uid = documentSnapshot.get('uid');
 
-          var phone= documentSnapshot.get('email').toString().split("@");
-          clint_phone=phone[0];
-         // print(clint_phone);
+          var phone = documentSnapshot.get('email').toString().split("@");
+          clint_phone = phone[0];
+          // print(clint_phone);
         });
       }
     }).then((value) {
-
-
-
-
       firestore
           .collection('orders')
-          .doc(orderId).snapshots().listen((DocumentSnapshot documentSnapshot) {
+          .doc(orderId)
+          .snapshots()
+          .listen((DocumentSnapshot documentSnapshot) {
         if (documentSnapshot.exists) {
           setState(() {
             dis_enable = documentSnapshot.get('dis_enable');
             un_send = documentSnapshot.get('un_send');
-            accept_order=documentSnapshot.get('accept_order');
+            accept_order = documentSnapshot.get('accept_order');
 
-            received_time=documentSnapshot.get('received_time');
-            finish_time=documentSnapshot.get('finish_time');
-            order_status= documentSnapshot.get('order_status');
-         //   send_time= documentSnapshot.get('send_time');
-           discount_pers=documentSnapshot.get('discount_pers');
+            received_time = documentSnapshot.get('received_time');
+            finish_time = documentSnapshot.get('finish_time');
+            order_status = documentSnapshot.get('order_status');
+            //   send_time= documentSnapshot.get('send_time');
+            discount_pers = documentSnapshot.get('discount_pers');
           });
         }
       });
-
     }).whenComplete(() {
       setState(() {
         flag = " ";
       });
     });
   }
+
   refresh() {
     setState(() {});
     Navigator.pop(context);
   }
+
   @override
   Widget build(BuildContext context) {
     return flag == '123'
@@ -151,18 +147,21 @@ var finish_time;
             //backgroundColor: Colors.amberAccent,
             appBar: AppBar(
               backgroundColor: appcolor,
-              title:  Text(other_name),
-              leading: Container(child: GestureDetector(onTap: (){
-                if(clint_phone.toString().isNotEmpty){
-                  UrlLauncher.launch("tel:+${clint_phone}");
-                  print(clint_phone);
-                }
-              },child:   Icon(
-                Icons.call,
-                color: Colors.white,
-                size: 30,
-              ),)),
-
+              title: Text(other_name),
+              leading: Container(
+                  child: GestureDetector(
+                onTap: () {
+                  if (clint_phone.toString().isNotEmpty) {
+                    UrlLauncher.launch("tel:+${clint_phone}");
+                    print(clint_phone);
+                  }
+                },
+                child: Icon(
+                  Icons.call,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              )),
               actions: <Widget>[
                 PopupMenuButton<String>(
                   onSelected: choiceAction,
@@ -210,65 +209,82 @@ var finish_time;
                                   document.data()['data'],
                                 )
                               : document.data()['type'] == 'record'
-                              ?  Drow_record(
-                              document.data()['message'],
-                              document.data()['sederEmail'],
-                              document.data()['data'],
-                              current_email
-                          )
-                              : document.data()['type'] == 'order'
-                                  ? Drow_order(
+                                  ? Drow_record(
                                       document.data()['message'],
                                       document.data()['sederEmail'],
                                       document.data()['data'],
-                                     document.data()['resturant_name'],
-                                       document.data()['resturant_longitude'],
-                                     document.data()['resturant_latitude'],
-                                    )
-                                  : document.data()['type'] == 'end_order'
-                                      ? Drow_end_order(
+                                      current_email)
+                                  : document.data()['type'] == 'order'
+                                      ? Drow_order(
                                           document.data()['message'],
                                           document.data()['sederEmail'],
                                           document.data()['data'],
+                                          document.data()['resturant_name'],
+                                          document
+                                              .data()['resturant_longitude'],
+                                          document.data()['resturant_latitude'],
                                         )
-                                            : document.data()['type'] == 'accept_order'
-                                            ? Drow_accept_order(
-                                          document.data()['message'],
-                                          document.data()['sederEmail'],
-                                          document.data()['data'],
-                                        )
-
-                                      : document.data()['type'] == 'image'
-                                          ? DrowImage(
+                                      : document.data()['type'] == 'end_order'
+                                          ? Drow_end_order(
                                               document.data()['message'],
                                               document.data()['sederEmail'],
                                               document.data()['data'],
                                             )
-                                      : document.data()['type'] ==   'reseat-image'
-                                              ? Drow_reseat_image(
-                                              document.data()['message'],
-                                              document.data()['sederEmail'],
-                                              document.data()['data'],
-                                              document.data()['total_price'],
-                                              document.data()['actual_price'],
-                                              document.data()['dicount_pers'],
-                                              )
-                                              : document.data()['type'] == 'Received_order'
-                                              ? Drow_Received_order(
-                                            document.data()['message'],
-                                            document.data()['sederEmail'],
-                                            document.data()['data'],
-                                          )
-                                          : DrowAdress(
-                                              document.data()['message'],
-                                              document.data()['sederEmail'],
-                                              document.data()['data'],
-                                            );
+                                          : document.data()['type'] ==
+                                                  'accept_order'
+                                              ? Drow_accept_order(
+                                                  document.data()['message'],
+                                                  document.data()['sederEmail'],
+                                                  document.data()['data'],
+                                                )
+                                              : document.data()['type'] ==
+                                                      'image'
+                                                  ? DrowImage(
+                                                      document
+                                                          .data()['message'],
+                                                      document
+                                                          .data()['sederEmail'],
+                                                      document.data()['data'],
+                                                    )
+                                                  : document.data()['type'] ==
+                                                          'reseat-image'
+                                                      ? Drow_reseat_image(
+                                                          document.data()[
+                                                              'message'],
+                                                          document.data()[
+                                                              'sederEmail'],
+                                                          document
+                                                              .data()['data'],
+                                                          document.data()[
+                                                              'total_price'],
+                                                          document.data()[
+                                                              'actual_price'],
+                                                          document.data()[
+                                                              'dicount_pers'],
+                                                        )
+                                                      : document.data()[
+                                                                  'type'] ==
+                                                              'Received_order'
+                                                          ? Drow_Received_order(
+                                                              document.data()[
+                                                                  'message'],
+                                                              document.data()[
+                                                                  'sederEmail'],
+                                                              document.data()[
+                                                                  'data'],
+                                                            )
+                                                          : DrowAdress(
+                                                              document.data()[
+                                                                  'message'],
+                                                              document.data()[
+                                                                  'sederEmail'],
+                                                              document.data()[
+                                                                  'data'],
+                                                            );
                         }).toList(),
                       ),
                     ),
                     Align(
-
                       alignment: Alignment.bottomRight,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -277,8 +293,9 @@ var finish_time;
                               ? SendImage(orderId, current_email)
                               : SizedBox(),
                           dis_enable == false
-                              ? SendRecord(orderId,current_email,
-                other_name,other_uid,other_profile_image, notifyParent: refresh )
+                              ? SendRecord(orderId, current_email, other_name,
+                                  other_uid, other_profile_image,
+                                  notifyParent: refresh)
                               : SizedBox(),
                           dis_enable == false
                               ? Expanded(
@@ -304,7 +321,9 @@ var finish_time;
                                     ),
                                   ),
                                 )
-                              : un_send == true ? un_send_widget() : compleate_order_widget(),
+                              : un_send == true
+                                  ? un_send_widget()
+                                  : compleate_order_widget(),
                           dis_enable == false
                               ? IconButton(
                                   icon: Icon(Icons.send),
@@ -400,7 +419,7 @@ var finish_time;
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color:  Colors.green,
+                color: Colors.green,
               ),
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: Column(
@@ -436,9 +455,10 @@ var finish_time;
 
   Widget DrowImage(message, senderEmail, data) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return show_photo_in_one_screan(message);}));
+          return show_photo_in_one_screan(message);
+        }));
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
@@ -490,11 +510,14 @@ var finish_time;
       ),
     );
   }
-  Widget Drow_reseat_image(message, senderEmail, data,total_price,actual_price,dicount_pers) {
+
+  Widget Drow_reseat_image(
+      message, senderEmail, data, total_price, actual_price, dicount_pers) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return show_photo_in_one_screan(message);}));
+          return show_photo_in_one_screan(message);
+        }));
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
@@ -530,13 +553,14 @@ var finish_time;
                       height: 10,
                     ),
                     Text(
-                      "المبلغ الكلي = ${total_price }",
+                      "المبلغ الكلي = ${total_price}",
                       style: TextStyle(
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
                           fontSize: 20),
-                    ), SizedBox(
+                    ),
+                    SizedBox(
                       height: 10,
                     ),
                     Text(
@@ -551,7 +575,7 @@ var finish_time;
                       height: 10,
                     ),
                     Text(
-                      "نسبه الخصم = ${dicount_pers }",
+                      "نسبه الخصم = ${dicount_pers}",
                       style: TextStyle(
                           color: senderEmail == current_email
                               ? Colors.white
@@ -562,7 +586,7 @@ var finish_time;
                       height: 10,
                     ),
                     Text(
-                      " المبلغ بعد الخصم = ${actual_price }",
+                      " المبلغ بعد الخصم = ${actual_price}",
                       style: TextStyle(
                           color: senderEmail == current_email
                               ? Colors.white
@@ -589,9 +613,6 @@ var finish_time;
       ),
     );
   }
-
-
-
 
   Widget un_send_widget() {
     return Expanded(
@@ -636,7 +657,8 @@ var finish_time;
     );
   }
 
-  Widget Drow_order(message, sender_email, data, resturant_name, resturant_longitude, resturant_latitude) {
+  Widget Drow_order(message, sender_email, data, resturant_name,
+      resturant_longitude, resturant_latitude) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
@@ -678,13 +700,14 @@ var finish_time;
                           children: [
                             Flexible(
                                 child: Text(
-                                  'إسم المطعــــــــــــم',
-                                  style:
+                              'إسم المطعــــــــــــم',
+                              style:
                                   TextStyle(fontSize: 18, color: Colors.black),
-                                )),
+                            )),
                             InkWell(
-                                onTap: (){
-                                  if (resturant_longitude != null && resturant_latitude != null) {
+                                onTap: () {
+                                  if (resturant_longitude != null &&
+                                      resturant_latitude != null) {
                                     _launchURL(
                                         'http://maps.google.com/maps?q=${resturant_longitude},${resturant_latitude}+(My+Point)&z=16&ll=${resturant_longitude},${resturant_latitude}');
                                   }
@@ -711,9 +734,7 @@ var finish_time;
                   ),
                   Text(
                     getdata(data),
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ],
               ),
@@ -723,6 +744,7 @@ var finish_time;
       ),
     );
   }
+
   Widget compleate_order_widget() {
     return Expanded(
       child: Container(
@@ -765,6 +787,7 @@ var finish_time;
       ),
     );
   }
+
   Widget Drow_Received_order(message, senderEmail, data) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
@@ -799,9 +822,7 @@ var finish_time;
                   ),
                   Text(
                     getdata(data),
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ],
               ),
@@ -931,8 +952,6 @@ var finish_time;
     );
   }
 
-
-
   _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -1015,17 +1034,18 @@ var finish_time;
                 onPressed: () {
                   HelpFun().startLoading(context);
                   PostViewModel postViewModel = new PostViewModel();
-                  postViewModel.addComplaint(
-                      coplainControler.text.toString(),
-                      current_uid,
-                      other_uid,
-                      "user",
-                      orderId,
-                      DateTime.now().toIso8601String().toString()).then((value) {
-                        HelpFun().closeLoading(context);
-                        HelpFun().my_Toast("تم إرسال الشكوي", context);
-                        Navigator.pop(context);
-
+                  postViewModel
+                      .addComplaint(
+                          coplainControler.text.toString(),
+                          current_uid,
+                          other_uid,
+                          "user",
+                          orderId,
+                          DateTime.now().toIso8601String().toString())
+                      .then((value) {
+                    HelpFun().closeLoading(context);
+                    HelpFun().my_Toast("تم إرسال الشكوي", context);
+                    Navigator.pop(context);
                   });
                 },
               ),
@@ -1045,16 +1065,12 @@ var finish_time;
         take_resrat();
       }
     } else if (choice == Constants.end_order) {
-        _finish_order_fun();
-    }
-    else if (choice == Constants.accept_order){
+      _finish_order_fun();
+    } else if (choice == Constants.accept_order) {
       _accept_order_fun();
+    } else if (choice == Constants.share_loc) {
+      Send_Address(orderId, current_email, context).fun_send_address();
     }
-    else if (choice == Constants.share_loc){
-      Send_Address(orderId,current_email,context).fun_send_address();
-    }
-
-
   }
 
   Future<void> take_resrat() async {
@@ -1080,18 +1096,22 @@ var finish_time;
                     children: [
                       TextField(
                         // maxLines: 6,
-                         keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.number,
                         controller: priseControler,
-                        onChanged: (val){
+                        onChanged: (val) {
                           setState(() {
-                               print(int.parse(priseControler.text.toString()));
-                             var  total_dic= (discount_pers/100)* int.parse(priseControler.text.toString());
+                            print(int.parse(priseControler.text.toString()));
+                            var total_dic = (discount_pers / 100) *
+                                int.parse(priseControler.text.toString());
 
-                               total_price=double.parse(priseControler.text.toString());
-                               actual_price =double.parse(priseControler.text.toString())-total_dic+12;
-                           //  print(total_price);
+                            total_price =
+                                double.parse(priseControler.text.toString());
+                            actual_price =
+                                double.parse(priseControler.text.toString()) -
+                                    total_dic +
+                                    12;
+                            //  print(total_price);
                           });
-
                         },
                         decoration: InputDecoration(
                           prefix: Text("جنيه مصري"),
@@ -1110,10 +1130,12 @@ var finish_time;
                         ),
                         textAlign: TextAlign.end,
                       ),
-                      SizedBox(height: 10,),
-                      Text(" نسبه الخصم =  ${ discount_pers}"),
-                     // SizedBox(height: 10,),
-                   //   Text(" السعر الكلي  =  ${total_price}"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(" نسبه الخصم =  ${discount_pers}"),
+                      // SizedBox(height: 10,),
+                      //   Text(" السعر الكلي  =  ${total_price}"),
 
                       RaisedButton(
                         onPressed: () {
@@ -1171,9 +1193,9 @@ var finish_time;
       firestore.collection('orders').doc(orderId).collection('messages').add({
         'message': url,
         'type': 'reseat-image',
-        'total_price':total_price,
-        'dicount_pers':discount_pers,
-        'actual_price':actual_price,
+        'total_price': total_price,
+        'dicount_pers': discount_pers,
+        'actual_price': actual_price,
         'data': DateTime.now().toIso8601String().toString(),
         'sederEmail': current_email,
       }).then((value) {
@@ -1207,92 +1229,76 @@ var finish_time;
     }
   }
 
-
   void _accept_order_fun() {
-    if(un_send==false&&accept_order==""){
-      firestore
-          .collection('orders')
-          .doc(orderId)
-          .collection('messages')
-          .add({
+    if (un_send == false && accept_order == "") {
+      firestore.collection('orders').doc(orderId).collection('messages').add({
         'message': "تم قبول الطلب",
         'type': 'accept_order',
-        'data': DateTime.now()
-            .toIso8601String()
-            .toString(),
+        'data': DateTime.now().toIso8601String().toString(),
         'sederEmail': current_email,
       }).whenComplete(() {
-        firestore
-            .collection('orders')
-            .doc(orderId).update({
+        firestore.collection('orders').doc(orderId).update({
           "order_status": 2,
-          "accept_order":DateTime.now()
-              .toIso8601String()
-              .toString()
+          "accept_order": DateTime.now().toIso8601String().toString()
         }).whenComplete(() {
           firestore
               .collection('delivery_boys')
-              .doc(current_uid).get().then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-          setState(() {
-            cur_orders = documentSnapshot.get('current_orders');
+              .doc(current_uid)
+              .get()
+              .then((DocumentSnapshot documentSnapshot) {
+            if (documentSnapshot.exists) {
+              setState(() {
+                cur_orders = documentSnapshot.get('current_orders');
+              });
+            }
           });
-          }
-          });
-
         }).whenComplete(() {
-          firestore
-              .collection('delivery_boys')
-              .doc(current_uid).update({
-            "current_orders": cur_orders+1,
+          firestore.collection('delivery_boys').doc(current_uid).update({
+            "current_orders": cur_orders + 1,
           });
         });
       });
-
-
     }
   }
 
   void _finish_order_fun() {
-    if (dis_enable == false&&accept_order!=""&&received_time!=""&&finish_time=="") {
+    if (dis_enable == false &&
+        accept_order != "" &&
+        received_time != "" &&
+        finish_time == "") {
       firestore.collection('orders').doc(orderId).collection('messages').add({
         'message': 'تم انهاء الطلب',
         'type': 'end_order',
         'data': DateTime.now().toIso8601String().toString(),
         'sederEmail': current_email,
       }).whenComplete(() {
-        firestore
-            .collection('orders')
-            .doc(orderId).update({
+        firestore.collection('orders').doc(orderId).update({
           "order_status": 4,
-          "dis_enable":true,
-          "finish_time":DateTime.now()
-              .toIso8601String()
-              .toString()
+          "dis_enable": true,
+          "finish_time": DateTime.now().toIso8601String().toString()
         }).whenComplete(() {
           _Show_rates_dialog();
         });
-
       }).whenComplete(() {
         firestore
             .collection('delivery_boys')
-            .doc(current_uid).get().then((DocumentSnapshot documentSnapshot) {
+            .doc(current_uid)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
             setState(() {
               cur_orders = documentSnapshot.get('current_orders');
             });
           }
         });
-
       }).whenComplete(() {
-        firestore
-            .collection('delivery_boys')
-            .doc(current_uid).update({
-          "current_orders": cur_orders-1,
+        firestore.collection('delivery_boys').doc(current_uid).update({
+          "current_orders": cur_orders - 1,
         });
       });
     }
   }
+
   void _Show_rates_dialog() {
     showDialog(
         context: context,
@@ -1300,11 +1306,10 @@ var finish_time;
         builder: (context) {
           return RatingDialog(
             icon: const FlutterLogo(
-                size: 100,
-                colors: Colors.red), // set your own image/icon widget
+              size: 100,
+            ), // set your own image/icon widget
             title: "برجاء تقييم العميل ",
-            description:
-            "",
+            description: "",
             submitButton: "تقييم",
             alternativeButton: "اغلاق", // optional
             positiveComment: "", // optional

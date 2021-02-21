@@ -26,10 +26,10 @@ class DeliveryTime {
               'delivery boy ${timeNow.difference(dateEnd).isNegative} ${timeNow.difference(dateStr).isNegative} ');
 
           if (timeNow.isAfter(dateStr) && timeNow.isBefore(dateEnd)) {
-            print('delivery boy ${value.dboyname} $nameOfDay is online');
+            print('currennnt::::: ${value.dboyname} $nameOfDay is online');
             result = true;
           } else {
-            print('delivery boy ${value.dboyname} $nameOfDay is offline');
+            print('currennnt::::: ${value.dboyname} $nameOfDay is offline');
             result = false;
           }
           break;
@@ -38,10 +38,10 @@ class DeliveryTime {
 
           DateTime dateEnd = new DateFormat("hh:mm").parse(value.sun_end);
           if (timeNow.isAfter(dateStr) && timeNow.isBefore(dateEnd)) {
-            print('delivery boy ${value.dboyname} $nameOfDay is online');
+            print('currennnt::::: ${value.dboyname} $nameOfDay is online');
             result = true;
           } else {
-            print('delivery boy ${value.dboyname} $nameOfDay is offline');
+            print('currennnt::::: ${value.dboyname} $nameOfDay is offline');
             result = false;
           }
           break;
