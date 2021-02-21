@@ -38,10 +38,10 @@ class DeliveryTime {
 
           DateTime dateEnd = new DateFormat("hh:mm").parse(value.sun_end);
           if (timeNow.isAfter(dateStr) && timeNow.isBefore(dateEnd)) {
-            print('currennnt::::: ${value.dboyname} $nameOfDay is online');
+            print('currennnt:: $dateStr:: $timeNow: $dateEnd::  is online');
             result = true;
           } else {
-            print('currennnt::::: ${value.dboyname} $nameOfDay is offline');
+            print('currennnt:: $dateStr:: $timeNow: $dateEnd::  is online');
             result = false;
           }
           break;

@@ -124,7 +124,6 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                           onChanged: (value) {
                             print("VALUE : $value");
                             if (value) {
-                              PostViewModel postViewModel = new PostViewModel();
                               deliveryTime
                                   .getDeliveryTime(current_uid)
                                   .then((in_time) {
@@ -139,7 +138,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                         'online',
                                         'true',
                                         current_uid,
-                                        'in zone',
+                                        '1',
                                         date.toString())
                                     .then((value) {
                                   print('currennnt:: ${value.status}');
@@ -150,7 +149,6 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                 });
                               });
                             } else {
-                              PostViewModel postViewModel = new PostViewModel();
                               DateTime date = DateTime.now();
 
                               postViewModel.deliveryBoyLogs(
