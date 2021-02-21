@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:talabak_delivery_boy/models/complaintModel.dart';
+import 'package:talabak_delivery_boy/models/deliveryTimeTableModel.dart';
 import 'package:talabak_delivery_boy/models/rateModel.dart';
 import 'package:talabak_delivery_boy/models/userModel.dart';
 
@@ -93,6 +94,19 @@ class PostViewModel {
       return ComplaintModel.fromJson(convert.json.decode(response.body)).status;
     } else {
       return ComplaintModel.fromJson(convert.json.decode(response.body)).status;
+    }
+  }
+
+  Future<DeliveryTimeTableModel> getDeliveryTime(String dboyid) async {
+    var response =
+        await http.post('$baseUrl/dboysearch.php', body: {'dboyid': dboyid});
+
+    if (response.statusCode == 200) {
+      return DeliveryTimeTableModel.fromJson(
+          convert.json.decode(response.body));
+    } else {
+      return DeliveryTimeTableModel.fromJson(
+          convert.json.decode(response.body));
     }
   }
 

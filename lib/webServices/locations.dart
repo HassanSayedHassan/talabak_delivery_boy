@@ -3,9 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 
 class Locations {
- // FirebaseAuth auth = FirebaseAuth.instance;
+  // FirebaseAuth auth = FirebaseAuth.instance;
   Future<Position> getCurrentLocatiosn() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -32,43 +33,48 @@ class Locations {
   getLocationContenously(String status) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userID = prefs.getString("userID");
+    String name = prefs.getString("name");
+    String playerID = prefs.getString("playerID");
+    String phone = prefs.getString("phone");
 
-   /// StreamSubscription<Position> positionStream =
+    /// StreamSubscription<Position> positionStream =
     ///  29.3083333
     /// 30.8447222
-        Geolocator.getPositionStream().listen((Position position) {
-          if (position != null) {
-            var distance=Geolocator.distanceBetween(position.latitude, position.longitude,29.3083333, 30.8447222);
-            print("distance    $distance");
-            if(distance>2500){
-              /// out of zoon
-              ///
-            }
-            FirebaseFirestore.instance
-                .collection('locations')
-                .doc(userID)
-                .get()
-                .then((DocumentSnapshot documentSnapshot) {
-              if (documentSnapshot.exists) {
-                // ignore: deprecated_member_use
-                firestore.collection('locations').doc(userID).update({
-                  'latitude': position.latitude,
-                  'longitude': position.longitude,
-                });
-              }
-              else{
-                firestore.collection('locations') .doc(userID).set({
-                  'latitude': position.latitude,
-                  'longitude': position.longitude,
-                });
-              }
+    Geolocator.getPositionStream().listen((Position position) {
+      if (position != null) {
+        var distance = Geolocator.distanceBetween(
+            position.latitude, position.longitude, 29.3083333, 30.8447222);
+        print("distance    $distance");
+        if (distance > 2500) {
+          /// out of zoon
+          ///
+          PostViewModel postViewModel = new PostViewModel();
+          DateTime date = DateTime.now();
+
+          postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
+              'false', userID, distance.toString(), date.toString());
+        }
+        FirebaseFirestore.instance
+            .collection('locations')
+            .doc(userID)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            // ignore: deprecated_member_use
+            firestore.collection('locations').doc(userID).update({
+              'latitude': position.latitude,
+              'longitude': position.longitude,
             });
-
-
+          } else {
+            firestore.collection('locations').doc(userID).set({
+              'latitude': position.latitude,
+              'longitude': position.longitude,
+            });
           }
+        });
+      }
     });
   }
 

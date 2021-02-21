@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/Edit_profile.dart';
 import 'package:talabak_delivery_boy/screans/log_in_screan.dart';
+import 'package:talabak_delivery_boy/webServices/deliverytime.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:toast/toast.dart';
@@ -19,7 +20,7 @@ class Profile_Screan extends StatefulWidget {
 }
 
 class _Profile_ScreansState extends State<Profile_Screan> {
- // FirebaseAuth auth = FirebaseAuth.instance;
+  // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   PostViewModel postViewModel = new PostViewModel();
   var name = 'hi';
@@ -36,37 +37,36 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   Locations locations = new Locations();
 
   var rates;
-  
-  var my_orders_number=0;
+  String userID;
 
+  var my_orders_number = 0;
 
   SharedPreferences getUserData;
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
 
-
-
-
-
   get_current_user() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //name= prefs.getString( 'name' );
-    current_uid = prefs.getString( 'userID' );
+    current_uid = prefs.getString('userID');
+    userID = prefs.getString("userID");
+    name = prefs.getString("name");
+    playerID = prefs.getString("playerID");
+    phone = prefs.getString("phone");
     //profile_image= prefs.getString( 'email' );
 
     FirebaseFirestore.instance
         .collection('orders')
         .get()
-        .then((QuerySnapshot querySnapshot) =>
-    {
-      querySnapshot.docs.forEach((doc) {
-        if (doc["sender_uid"] == current_uid && doc["order_status"] == 4) {
-          my_orders_number++;
-          print(my_orders_number);
-        }
-      })
-    })
+        .then((QuerySnapshot querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                if (doc["sender_uid"] == current_uid &&
+                    doc["order_status"] == 4) {
+                  my_orders_number++;
+                  print(my_orders_number);
+                }
+              })
+            })
         .whenComplete(() {
-
       FirebaseFirestore.instance
           .collection('delivery_boys')
           .doc(current_uid)
@@ -79,28 +79,26 @@ class _Profile_ScreansState extends State<Profile_Screan> {
           });
         }
       });
-
     });
     postViewModel.getDeliveryBoyRate(current_uid).then((value) {
-     setState(() {
-       if(value==null){
-         rates="0";
-       }
-       else{
-         rates=value;
-       }
-     });
-
+      setState(() {
+        if (value == null) {
+          rates = "0";
+        } else {
+          rates = value;
+        }
+      });
     });
-
   }
 
+  DeliveryTime deliveryTime = new DeliveryTime();
 //myinit_stat(){}
   @override
   void initState() {
     get_current_user();
-
-
+    deliveryTime.getDeliveryTime(current_uid).then((value) {
+      //true or false if user in scadule
+    });
   }
 
   @override
@@ -131,7 +129,33 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                             setState(() {
                               status = value;
                             });
+                            if (value) {
+                              PostViewModel postViewModel = new PostViewModel();
+                              DateTime date = DateTime.now();
 
+                              postViewModel.deliveryBoyLogs(
+                                  phone,
+                                  name,
+                                  playerID,
+                                  'online',
+                                  'true',
+                                  userID,
+                                  'in zone',
+                                  date.toString());
+                            } else {
+                              PostViewModel postViewModel = new PostViewModel();
+                              DateTime date = DateTime.now();
+
+                              postViewModel.deliveryBoyLogs(
+                                  phone,
+                                  name,
+                                  playerID,
+                                  'offline',
+                                  'true',
+                                  userID,
+                                  'in zone',
+                                  date.toString());
+                            }
                           },
                         ),
                         SizedBox(
@@ -159,7 +183,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                               ),
                             ),
                             RatingBarIndicator(
-                              rating: rates==null?0:double.parse(rates),
+                              rating: rates == null ? 0 : double.parse(rates),
                               itemBuilder: (context, index) => Icon(
                                 Icons.star,
                                 color: Colors.amber,
@@ -218,8 +242,8 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                   SizedBox(
                     height: 10,
                   ),
-                  DrowListItem('عدد الطلبات',my_orders_number.toString(), Icons.directions_car),
-                  DrowListItem('تقييمات الخدمات', '4', Icons.star),
+                  DrowListItem('عدد الطلبات', my_orders_number.toString(),
+                      Icons.directions_car),
                   DrowListItem('تسجيل الخروج', '', Icons.arrow_back),
                 ],
               ),
@@ -230,21 +254,20 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     );
   }
 
-  del_boy_off(uid){
-    firestore.collection('delivery_boys').doc(uid).update(
-        {
-          "status":false,
-        }).whenComplete(() {
+  del_boy_off(uid) {
+    firestore.collection('delivery_boys').doc(uid).update({
+      "status": false,
+    }).whenComplete(() {
       setState(() {
-    //    _swich = val;
+        //    _swich = val;
       });
     });
   }
-  del_boy_on(uid){
-    firestore.collection('delivery_boys').doc(uid).update(
-        {
-          "status":true,
-        }).whenComplete(() {
+
+  del_boy_on(uid) {
+    firestore.collection('delivery_boys').doc(uid).update({
+      "status": true,
+    }).whenComplete(() {
       setState(() {
         //    _swich = val;
       });
@@ -256,13 +279,13 @@ class _Profile_ScreansState extends State<Profile_Screan> {
       onTap: () async {
         if (title == 'تسجيل الخروج') {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('name',"").whenComplete(() {
+          prefs.setString('name', "").whenComplete(() {
             print(prefs.getString('name'));
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (c) {
-              return LogIn();}), (route) => false);
+            Navigator.pushAndRemoveUntil(context,
+                MaterialPageRoute(builder: (c) {
+              return LogIn();
+            }), (route) => false);
           });
-
-
 
           Toast.show("تم تسجيل الخروج", context,
               duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
