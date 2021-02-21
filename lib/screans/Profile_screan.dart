@@ -39,7 +39,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   var rates;
   String userID;
 
-  var flag="123";
+  var flag = "123";
   var my_orders_number = 0;
 
   SharedPreferences getUserData;
@@ -102,7 +102,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
       }
     }).whenComplete(() {
       setState(() {
-        flag="";
+        flag = "";
       });
     });
   }
@@ -116,169 +116,180 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return  flag=="123"?  Scaffold(
-        body:Center(
-          child: CircularProgressIndicator(strokeWidth: 5,backgroundColor: appcolor,),
-        )
-    ): SafeArea(
-      child: Scaffold(
-        body: Column(
-          children: [
-            Container(
-              height: size.height * (90/756.0),
-              color: Color(0xfff4f1f1),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+    return flag == "123"
+        ? Scaffold(
+            body: Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 5,
+              backgroundColor: appcolor,
+            ),
+          ))
+        : SafeArea(
+            child: Scaffold(
+              body: Column(
+                children: [
+                  Container(
+                    height: size.height * (90 / 756.0),
+                    color: Color(0xfff4f1f1),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: size.width * (10 / 360.0),
+                              ),
+                              CustomSwitch(
+                                activeColor: Colors.green,
+                                value: status,
+                                onChanged: (value) {
+                                  print("VALUE : $value");
+                                  if (value) {
+                                    deliveryTime
+                                        .getDeliveryTime(current_uid)
+                                        .then((inTime) {
+                                      print("in_timeeee   $inTime");
+                                      print("currennnt  $current_uid");
+                                      DateTime date = DateTime.now();
+                                      postViewModel
+                                          .deliveryBoyLogs(
+                                              phone,
+                                              name,
+                                              playerID,
+                                              'online',
+                                              'true',
+                                              current_uid,
+                                              '1',
+                                              date.toString())
+                                          .then((value) {
+                                        print('currennnt:: ${value.status}');
+                                      });
+                                      del_boy_on(current_uid);
+                                      setState(() {
+                                        status = value;
+                                      });
+                                    });
+                                  } else {
+                                    DateTime date = DateTime.now();
+
+                                    postViewModel
+                                        .deliveryBoyLogs(
+                                            phone,
+                                            name,
+                                            playerID,
+                                            'offline',
+                                            'true',
+                                            userID,
+                                            'in zone',
+                                            date.toString())
+                                        .then((value) {
+                                      print('currennnt:: ${value.status}');
+                                    });
+                                    del_boy_off(current_uid);
+                                    setState(() {
+                                      status = value;
+                                    });
+                                  }
+                                },
+                              ),
+                              SizedBox(
+                                width: size.width * (10 / 360.0),
+                              ),
+                              Icon(
+                                Icons.notifications,
+                                size: size.width * (30 / 360.0),
+                                color: Color(0xFF12c0c7),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: size.width * (20 / 360.0),
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  RatingBarIndicator(
+                                    rating:
+                                        rates == null ? 0 : double.parse(rates),
+                                    itemBuilder: (context, index) => Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                    ),
+                                    itemCount: 5,
+                                    itemSize: size.width * (20 / 360.0),
+                                    direction: Axis.horizontal,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Stack(alignment: Alignment.center, children: [
+                                CircleAvatar(
+                                  radius: size.width * 45 / 360.0,
+                                  //backgroundColor: const Color(0xFF03144c),
+                                  child: CircleAvatar(
+                                    radius: size.width * (45 / 360.0),
+                                    backgroundImage: profile_image != null
+                                        ? NetworkImage(profile_image)
+                                        : AssetImage('assets/images/ep.jpg'),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.grey.shade50,
+                                    child: IconButton(
+                                        icon: Icon(
+                                          Icons.add_a_photo,
+                                          color: const Color(0xFF03144c),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(builder: (c) {
+                                            return EditProfile(current_uid);
+                                          }));
+                                        }),
+                                  ),
+                                ),
+                              ]),
+                              SizedBox(
+                                width: size.width * (20 / 360.0),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
                       children: [
                         SizedBox(
-                          width: size.width * (10/360.0),
+                          height: size.height * (10 / 756.0),
                         ),
-                        CustomSwitch(
-                          activeColor: Colors.green,
-                          value: status,
-                          onChanged: (value) {
-                            print("VALUE : $value");
-                            if (value) {
-                              deliveryTime.getDeliveryTime(current_uid).then((in_time) {
-                                print("in_timeeee   $in_time");
-                                print("currennnt  $current_uid");
-                                DateTime date = DateTime.now();
-                                postViewModel
-                                    .deliveryBoyLogs(
-                                        phone,
-                                        name,
-                                        playerID,
-                                        'online',
-                                        'true',
-                                        current_uid,
-                                        '1',
-                                        date.toString())
-                                    .then((value) {
-                                  print('currennnt:: ${value.status}');
-                                });
-                                del_boy_on(current_uid);
-                                setState(() {
-                                  status = value;
-                                });
-                              });
-                            } else {
-                              DateTime date = DateTime.now();
-
-                              postViewModel.deliveryBoyLogs(
-                                  phone,
-                                  name,
-                                  playerID,
-                                  'offline',
-                                  'true',
-                                  userID,
-                                  'in zone',
-                                  date.toString());
-                              del_boy_off(current_uid);
-                              setState(() {
-                                status = value;
-                              });
-                            }
-                          },
-                        ),
-                        SizedBox(
-                          width: size.width * (10/360.0),
-                        ),
-                        Icon(
-                          Icons.notifications,
-                          size: size.width * (30/360.0),
-                          color: Color(0xFF12c0c7),
-                        ),
+                        DrowListItem('عدد الطلبات', my_orders_number.toString(),
+                            Icons.directions_car),
+                        DrowListItem('تسجيل الخروج', '', Icons.arrow_back),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              name,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: size.width * (20/360.0),
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            RatingBarIndicator(
-                              rating: rates == null ? 0 : double.parse(rates),
-                              itemBuilder: (context, index) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              itemCount: 5,
-                              itemSize: size.width * (20/360.0),
-                              direction: Axis.horizontal,
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Stack(alignment: Alignment.center, children: [
-                          CircleAvatar(
-                            radius: size.width * 45/360.0,
-                            //backgroundColor: const Color(0xFF03144c),
-                            child: CircleAvatar(
-                              radius: size.width * (45/360.0),
-                              backgroundImage: profile_image != null
-                                  ? NetworkImage(profile_image)
-                                  : AssetImage('assets/images/ep.jpg'),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey.shade50,
-                              child: IconButton(
-                                  icon: Icon(
-                                    Icons.add_a_photo,
-                                    color: const Color(0xFF03144c),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(builder: (c) {
-                                      return EditProfile(current_uid);
-                                    }));
-                                  }),
-                            ),
-                          ),
-                        ]),
-                        SizedBox(
-                          width: size.width * (20/360.0),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: size.height * (10/756.0),
                   ),
-                  DrowListItem('عدد الطلبات', my_orders_number.toString(),
-                      Icons.directions_car),
-                  DrowListItem('تسجيل الخروج', '', Icons.arrow_back),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 
   del_boy_off(uid) {
@@ -329,11 +340,13 @@ class _Profile_ScreansState extends State<Profile_Screan> {
           ),
           trailing: Text(
             number,
-            style: TextStyle(color: Color(0xFF12c0c7), fontSize: size.width * (20/360.0)),
+            style: TextStyle(
+                color: Color(0xFF12c0c7), fontSize: size.width * (20 / 360.0)),
           ),
           title: Text(
             title,
-            style: TextStyle(color: Colors.black, fontSize: size.width * (20/360.0)),
+            style: TextStyle(
+                color: Colors.black, fontSize: size.width * (20 / 360.0)),
           ),
         ),
       ),
