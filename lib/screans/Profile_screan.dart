@@ -129,27 +129,25 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   .getDeliveryTime(current_uid)
                                   .then((in_time) {
                                 print("in_timeeee   $in_time");
-                                if (!in_time) {
-                                  print("currennnt  $current_uid");
-                                  DateTime date = DateTime.now();
-                                  postViewModel
-                                      .deliveryBoyLogs(
-                                          phone,
-                                          name,
-                                          playerID,
-                                          'online',
-                                          'true',
-                                          current_uid,
-                                          'in zone',
-                                          date.toString())
-                                      .then((value) {
-                                    print('currennnt:: ${value.status}');
-                                  });
-                                  del_boy_on(current_uid);
-                                  setState(() {
-                                    status = value;
-                                  });
-                                }
+                                print("currennnt  $current_uid");
+                                DateTime date = DateTime.now();
+                                postViewModel
+                                    .deliveryBoyLogs(
+                                        phone,
+                                        name,
+                                        playerID,
+                                        'online',
+                                        'true',
+                                        current_uid,
+                                        'in zone',
+                                        date.toString())
+                                    .then((value) {
+                                  print('currennnt:: ${value.status}');
+                                });
+                                del_boy_on(current_uid);
+                                setState(() {
+                                  status = value;
+                                });
                               });
                             } else {
                               PostViewModel postViewModel = new PostViewModel();
