@@ -84,14 +84,15 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 200,
-              height: 200,
+              width: size.width * (200/360.0),
+              height: size.height * (200/756.0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
               ),
@@ -106,10 +107,10 @@ class _EditProfileState extends State<EditProfile> {
                     ? Icon(
                         Icons.add_a_photo,
                         color: Colors.amber,
-                        size: 70,
+                        size: size.width * (70/360.0),
                       )
                     : null,
-                radius: 70,
+                radius: size.width * (70/360.0),
               ),
             ),
             RaisedButton(
@@ -119,12 +120,12 @@ class _EditProfileState extends State<EditProfile> {
               },
             ),
             SizedBox(
-              height: 30,
+              height: size.height * (30/756.0),
             ),
             RaisedButton(
                 child: Text('حفظ الصورة'),
                 color: Colors.amber,
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 50),
+                padding: EdgeInsets.symmetric(vertical: size.height * (8/756.0), horizontal: size.width * (50/360.0)),
                 onPressed: () {
                   if (_pickedProfilePhoto != null) {
                     HelpFun().startLoading(context);

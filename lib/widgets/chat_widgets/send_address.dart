@@ -9,10 +9,11 @@ import 'package:toast/toast.dart';
 
 
 class Send_Address  {
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var channelId,current_email,context;
-  Send_Address(this.channelId,this.current_email,this.context);
+  var channelId,current_email,context,current_uid,other_uid;
+
+  Send_Address(this.current_uid,this.other_uid,this.channelId,this.current_email,this.context);
   var appcolor = Color(0xFF12c0c7);
 
   Position position;
@@ -54,6 +55,7 @@ class Send_Address  {
   }
 
   fun_send_address () {
+    Size size = MediaQuery.of(context).size;
     _determinePosition().then((value) {
       if (position.longitude.toString().isNotEmpty && position.latitude.toString().isNotEmpty) {
         closeLoading();
@@ -63,15 +65,15 @@ class Send_Address  {
               return Center(
                 child: Container(
                   color: appcolor,
-                  width: 300,
-                  height: 300,
+                  width: size.width * (300/360.0),
+                  height: size.height * (300/756.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset('assets/images/gmap.png'),
                       RaisedButton.icon(
                         icon: Text('Shere Your Location'),
-                        label: Icon(Icons.send,color: appcolor,size: 40,),
+                        label: Icon(Icons.send,color: appcolor,size: size.width * (40/360.0),),
                         color: Colors.white,
                         elevation: 10,
                         onPressed: () async {
@@ -100,7 +102,10 @@ class Send_Address  {
                                   .toString(),
                               'sederEmail': current_email,
                             }).then((value) =>
-                                Navigator.of(context).pop());
+                                Navigator.of(context).pop()).whenComplete(() {
+                              ///  Notification_1  تم مشاركه الموقع من {widget.current_uid}    to   {widget.other_uid}
+
+                            });
                           }
                           else {
                             closeLoading();

@@ -35,10 +35,11 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   bool inZone = false;
   bool beOffline = false;
   Locations locations = new Locations();
-
+  var appcolor = Color(0xFF12c0c7);
   var rates;
   String userID;
 
+  var flag="123";
   var my_orders_number = 0;
 
   SharedPreferences getUserData;
@@ -89,10 +90,24 @@ class _Profile_ScreansState extends State<Profile_Screan> {
         }
       });
     });
+    firestore
+        .collection('delivery_boys')
+        .doc(current_uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        setState(() {
+          status = documentSnapshot.get('status');
+        });
+      }
+    }).whenComplete(() {
+      setState(() {
+        flag="";
+      });
+    });
   }
 
   DeliveryTime deliveryTime = new DeliveryTime();
-//myinit_stat(){}
   @override
   void initState() {
     get_current_user();
@@ -100,12 +115,17 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    Size size = MediaQuery.of(context).size;
+    return  flag=="123"?  Scaffold(
+        body:Center(
+          child: CircularProgressIndicator(strokeWidth: 5,backgroundColor: appcolor,),
+        )
+    ): SafeArea(
       child: Scaffold(
         body: Column(
           children: [
             Container(
-              height: 90,
+              height: size.height * (90/756.0),
               color: Color(0xfff4f1f1),
               child: Center(
                 child: Row(
@@ -116,7 +136,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                          width: 10,
+                          width: size.width * (10/360.0),
                         ),
                         CustomSwitch(
                           activeColor: Colors.green,
@@ -124,9 +144,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                           onChanged: (value) {
                             print("VALUE : $value");
                             if (value) {
-                              deliveryTime
-                                  .getDeliveryTime(current_uid)
-                                  .then((in_time) {
+                              deliveryTime.getDeliveryTime(current_uid).then((in_time) {
                                 print("in_timeeee   $in_time");
                                 print("currennnt  $current_uid");
                                 DateTime date = DateTime.now();
@@ -168,11 +186,11 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                           },
                         ),
                         SizedBox(
-                          width: 10,
+                          width: size.width * (10/360.0),
                         ),
                         Icon(
                           Icons.notifications,
-                          size: 30,
+                          size: size.width * (30/360.0),
                           color: Color(0xFF12c0c7),
                         ),
                       ],
@@ -187,7 +205,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                               name,
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: size.width * (20/360.0),
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
@@ -198,7 +216,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                 color: Colors.amber,
                               ),
                               itemCount: 5,
-                              itemSize: 20.0,
+                              itemSize: size.width * (20/360.0),
                               direction: Axis.horizontal,
                             ),
                           ],
@@ -208,10 +226,10 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                         ),
                         Stack(alignment: Alignment.center, children: [
                           CircleAvatar(
-                            radius: 45,
+                            radius: size.width * 45/360.0,
                             //backgroundColor: const Color(0xFF03144c),
                             child: CircleAvatar(
-                              radius: 45,
+                              radius: size.width * (45/360.0),
                               backgroundImage: profile_image != null
                                   ? NetworkImage(profile_image)
                                   : AssetImage('assets/images/ep.jpg'),
@@ -237,7 +255,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                           ),
                         ]),
                         SizedBox(
-                          width: 20,
+                          width: size.width * (20/360.0),
                         ),
                       ],
                     )
@@ -249,7 +267,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
               child: ListView(
                 children: [
                   SizedBox(
-                    height: 10,
+                    height: size.height * (10/756.0),
                   ),
                   DrowListItem('عدد الطلبات', my_orders_number.toString(),
                       Icons.directions_car),
@@ -284,6 +302,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   }
 
   Widget DrowListItem(String title, String number, IconData ico) {
+    Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () async {
         if (title == 'تسجيل الخروج') {
@@ -310,11 +329,11 @@ class _Profile_ScreansState extends State<Profile_Screan> {
           ),
           trailing: Text(
             number,
-            style: TextStyle(color: Color(0xFF12c0c7), fontSize: 20),
+            style: TextStyle(color: Color(0xFF12c0c7), fontSize: size.width * (20/360.0)),
           ),
           title: Text(
             title,
-            style: TextStyle(color: Colors.black, fontSize: 18),
+            style: TextStyle(color: Colors.black, fontSize: size.width * (20/360.0)),
           ),
         ),
       ),

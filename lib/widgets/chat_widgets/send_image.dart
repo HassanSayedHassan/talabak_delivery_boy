@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 
 class SendImage extends StatefulWidget {
-  var channelId,current_email;
-  SendImage(this.channelId,this.current_email);
+  var channelId,current_email,current_uid,other_uid;
+  SendImage(this.current_uid,this.other_uid,this.channelId,this.current_email);
   @override
   _SendImageState createState() => _SendImageState(channelId,current_email);
 }
@@ -133,6 +133,8 @@ class _SendImageState extends State<SendImage> {
       }).then((value) {
         Send_Image = null;
         closeLoading();
+      }).whenComplete(() {
+        ///  Notification_1   تم ارسال صوره من {current_uid}    to   {other_uid}
       });
     }
     else{

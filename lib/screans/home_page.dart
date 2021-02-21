@@ -53,6 +53,7 @@ class _HomeScreanState extends State<HomeScrean> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedPageIndex,
@@ -60,12 +61,12 @@ class _HomeScreanState extends State<HomeScrean> {
         items: [
           Icon(
             Icons.account_circle,
-            size: 30,
+            size: size.width * (30/360.0),
             color: Colors.white,
           ),
           Icon(
             Icons.chat,
-            size: 30,
+            size: size.width * (30/360.0),
             color: Colors.white,
           ),
         ],

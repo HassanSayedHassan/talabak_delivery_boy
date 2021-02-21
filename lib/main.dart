@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Your Order',
       home: MyApplication(
-        app: current_name==""? LogIn():HomeScrean(),
+        app: current_name==""? LogIn():current_name==null? LogIn():HomeScrean(),
       ),
       routes: {
         'homeScrean': (context) => new HomeScrean(),

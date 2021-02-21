@@ -92,6 +92,7 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
   }
 
   Widget DrowListItem(String name, String uid, send_time,orderId,order_status) {
+    Size size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
        Navigator.push(context, MaterialPageRoute(builder: (c) {
@@ -103,11 +104,11 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
           children: [
             Image.asset(
               'assets/images/logo.png',
-              width: 60,
-              height: 60,
+              width: size.width * (60/360.0),
+              height: size.height * (60/756.0),
             ),
             SizedBox(
-              width: 20,
+              width: size.width * (20/360.0),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -117,7 +118,7 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
                   " طلب بتاريخ      ${getdata(send_time)}  ",
                   style: TextStyle(
                     color: appcolor,
-                    fontSize: 16,
+                    fontSize: size.width* (16/360.0),
                   ),
                 ),
                 Row(
@@ -126,15 +127,15 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
                     Text(
                       get_order_status(order_status),
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: size.width * (15/360.0),
                         color: Colors.black26,
                       ),
                     ),
-                    SizedBox(width: 20,),
+                    SizedBox(width: size.width * (20/360.0),),
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: size.width * (15/360.0),
                         color: Colors.black26,
                       ),
                     ),

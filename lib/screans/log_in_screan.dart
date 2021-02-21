@@ -26,13 +26,14 @@ class _LogInState extends State<LogIn> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               width: double.infinity,
-              height: 300,
+              height: size.height * (300/756.0),
               decoration: new BoxDecoration(
                 gradient: new LinearGradient(
                     colors: [
@@ -51,14 +52,14 @@ class _LogInState extends State<LogIn> {
                     Text(
                       'Talabak',
                       style: TextStyle(
-                          fontSize: 40,
+                          fontSize: size.width * (40/360.0),
                           fontWeight: FontWeight.bold,
                           color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                     Icon(
                       Icons.shopping_cart,
-                      size: 50,
+                      size: size.width * (50/360.0),
                       color: Colors.white,
                     ),
                   ],
@@ -74,7 +75,7 @@ class _LogInState extends State<LogIn> {
                     "تسجيل الدخول",
                     style: TextStyle(
                       color: Colors.black54,
-                      fontSize: 25,
+                      fontSize: size.width * (25/360.0),
                     ),
                   ),
                 ),
@@ -145,10 +146,12 @@ class _LogInState extends State<LogIn> {
     );
   }
 
-  Widget DrowTextField(
-      String label, Icon ico, TextEditingController controler) {
+  Widget DrowTextField(String label, Icon ico, TextEditingController controler) {
+    Size size = MediaQuery.of(context).size;
+
+
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(size.height * (10/360.0)),
       child: TextField(
         controller: controler,
         obscureText: label == 'password' ? true : false,
@@ -157,16 +160,16 @@ class _LogInState extends State<LogIn> {
             icon: ico,
             enabledBorder: OutlineInputBorder(
               borderSide:
-                  BorderSide(color: Colors.lightGreenAccent, width: 2.0),
+              BorderSide(color: Colors.lightGreenAccent, width: size.width * (2/360.0)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.green, width: 2.0),
+              borderSide: BorderSide(color: Colors.green, width: size.width * (2/360.0)),
             ),
             labelText: label,
             labelStyle: TextStyle(color: Colors.green)),
         style: TextStyle(
           color: Colors.black,
-          fontSize: 20,
+          fontSize: size.width * (20/360.0),
         ),
       ),
     );
