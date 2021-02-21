@@ -35,6 +35,8 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   bool beOffline = false;
   Locations locations = new Locations();
 
+  var rates;
+  
   var my_orders_number=0;
 
 
@@ -43,47 +45,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
 
 
-  getLocationContenously() async {
-    SharedPreferences getUserID;
-    Future<SharedPreferences> preferences = SharedPreferences.getInstance();
-    getUserID = await preferences;
-    String userID = getUserID.getString("userID");
 
-    getLocationContenously() {
-      Geolocator.getPositionStream().listen((Position position) {
-        if (position != null) {
-          locations
-              .getDestanceBetween(
-                  position.latitude, position.longitude, 29.308333, 73.984000)
-              .then((value) {
-            if (value > 2.5) {
-              setState(() {
-                beOffline = true;
-                inZone = false;
-                destance = '${value.toStringAsFixed(2)}.KM';
-              });
-              DateTime date = DateTime.now();
-              postViewModel
-                  .deliveryBoyLogs(phone, name, playerID, value.toString(),
-                      inZone.toString(), current_uid, destance, date.toString())
-                  .then((value) => print('destance::: ${value.playerID}'));
-            } else if (beOffline == true && value < 2.5) {
-              setState(() {
-                beOffline = false;
-                inZone = true;
-                destance = '${value.toStringAsFixed(2)}.KM';
-              });
-              DateTime date = DateTime.now();
-              postViewModel
-                  .deliveryBoyLogs(phone, name, playerID, value.toString(),
-                      inZone.toString(), current_uid, destance, date.toString())
-                  .then((value) => print('destance::: ${value.playerID}'));
-            }
-          });
-        }
-      });
-    }
-  }
 
   get_current_user() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -120,7 +82,14 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
     });
     postViewModel.getDeliveryBoyRate(current_uid).then((value) {
-      print("ratesss   ${ value.toString()}");
+     setState(() {
+       if(value==null){
+         rates="0";
+       }
+       else{
+         rates=value;
+       }
+     });
 
     });
 
@@ -131,39 +100,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   void initState() {
     get_current_user();
 
-    getLocationContenously();
-    locations.getCurrentLocatiosn().then((value) {
-      locations
-          .getDestanceBetween(
-              value.latitude, value.longitude, 29.308333, 73.984000)
-          .then((value) {
-        setState(() {
-          if (value > 2.5) {
-            setState(() {
-              beOffline = true;
-              inZone = false;
-              destance = '${value.toStringAsFixed(2)}.KM';
-            });
-            DateTime date = DateTime.now();
-            postViewModel
-                .deliveryBoyLogs(phone, name, playerID, value.toString(),
-                    inZone.toString(), current_uid, destance, date.toString())
-                .then((value) => print('destance::: ${value.playerID}'));
-          } else if (beOffline == true && value < 2.5) {
-            setState(() {
-              beOffline = false;
-              inZone = true;
-              destance = '${value.toStringAsFixed(2)}.KM';
-            });
-            DateTime date = DateTime.now();
-            postViewModel
-                .deliveryBoyLogs(phone, name, playerID, value.toString(),
-                    inZone.toString(), current_uid, destance, date.toString())
-                .then((value) => print('destance::: ${value.playerID}'));
-          }
-        });
-      });
-    });
+
   }
 
   @override
@@ -194,39 +131,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                             setState(() {
                               status = value;
                             });
-                            locations.getCurrentLocatiosn().then((value) {
-                              locations
-                                  .getDestanceBetween(value.latitude,
-                                      value.longitude, 26.3346673, 31.8929298)
-                                  .then((value) {
-                                print(
-                                    'destance: ${value.toStringAsFixed(2)}.KM');
 
-                                setState(() {
-                                  destance = '${value.toStringAsFixed(2)}.KM';
-                                });
-                                setState(() {
-                                  if (value > 50.0) {
-                                    inZone = false;
-                                  } else {
-                                    inZone = true;
-                                  }
-                                });
-                              });
-                            });
-                            DateTime date = DateTime.now();
-                            postViewModel
-                                .deliveryBoyLogs(
-                                    phone,
-                                    name,
-                                    playerID,
-                                    value.toString(),
-                                    inZone.toString(),
-                                    current_uid,
-                                    destance,
-                                    date.toString())
-                                .then((value) =>
-                                    print('destance::: ${value.playerID}'));
                           },
                         ),
                         SizedBox(
@@ -254,7 +159,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                               ),
                             ),
                             RatingBarIndicator(
-                              rating: 3.5,
+                              rating: rates==null?0:double.parse(rates),
                               itemBuilder: (context, index) => Icon(
                                 Icons.star,
                                 color: Colors.amber,
@@ -384,3 +289,121 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     );
   }
 }
+
+/*
+
+  getLocationContenously();
+    locations.getCurrentLocatiosn().then((value) {
+      locations
+          .getDestanceBetween(
+              value.latitude, value.longitude, 29.308333, 73.984000)
+          .then((value) {
+        setState(() {
+          if (value > 2.5) {
+            setState(() {
+              beOffline = true;
+              inZone = false;
+              destance = '${value.toStringAsFixed(2)}.KM';
+            });
+            DateTime date = DateTime.now();
+            postViewModel
+                .deliveryBoyLogs(phone, name, playerID, value.toString(),
+                    inZone.toString(), current_uid, destance, date.toString())
+                .then((value) => print('destance::: ${value.playerID}'));
+          } else if (beOffline == true && value < 2.5) {
+            setState(() {
+              beOffline = false;
+              inZone = true;
+              destance = '${value.toStringAsFixed(2)}.KM';
+            });
+            DateTime date = DateTime.now();
+            postViewModel
+                .deliveryBoyLogs(phone, name, playerID, value.toString(),
+                    inZone.toString(), current_uid, destance, date.toString())
+                .then((value) => print('destance::: ${value.playerID}'));
+          }
+        });
+      });
+    });
+
+
+      getLocationContenously() async {
+    SharedPreferences getUserID;
+    Future<SharedPreferences> preferences = SharedPreferences.getInstance();
+    getUserID = await preferences;
+    String userID = getUserID.getString("userID");
+
+    getLocationContenously() {
+      Geolocator.getPositionStream().listen((Position position) {
+        if (position != null) {
+          locations
+              .getDestanceBetween(
+                  position.latitude, position.longitude, 29.308333, 73.984000)
+              .then((value) {
+            if (value > 2.5) {
+              setState(() {
+                beOffline = true;
+                inZone = false;
+                destance = '${value.toStringAsFixed(2)}.KM';
+              });
+              DateTime date = DateTime.now();
+              postViewModel
+                  .deliveryBoyLogs(phone, name, playerID, value.toString(),
+                      inZone.toString(), current_uid, destance, date.toString())
+                  .then((value) => print('destance::: ${value.playerID}'));
+            } else if (beOffline == true && value < 2.5) {
+              setState(() {
+                beOffline = false;
+                inZone = true;
+                destance = '${value.toStringAsFixed(2)}.KM';
+              });
+              DateTime date = DateTime.now();
+              postViewModel
+                  .deliveryBoyLogs(phone, name, playerID, value.toString(),
+                      inZone.toString(), current_uid, destance, date.toString())
+                  .then((value) => print('destance::: ${value.playerID}'));
+            }
+          });
+        }
+      });
+    }
+  }
+
+
+
+
+
+                                locations.getCurrentLocatiosn().then((value) {
+                              locations
+                                  .getDestanceBetween(value.latitude,
+                                      value.longitude, 26.3346673, 31.8929298)
+                                  .then((value) {
+                                print(
+                                    'destance: ${value.toStringAsFixed(2)}.KM');
+
+                                setState(() {
+                                  destance = '${value.toStringAsFixed(2)}.KM';
+                                });
+                                setState(() {
+                                  if (value > 50.0) {
+                                    inZone = false;
+                                  } else {
+                                    inZone = true;
+                                  }
+                                });
+                              });
+                            });
+                            DateTime date = DateTime.now();
+                            postViewModel
+                                .deliveryBoyLogs(
+                                    phone,
+                                    name,
+                                    playerID,
+                                    value.toString(),
+                                    inZone.toString(),
+                                    current_uid,
+                                    destance,
+                                    date.toString())
+                                .then((value) =>
+                                    print('destance::: ${value.playerID}'));
+ */

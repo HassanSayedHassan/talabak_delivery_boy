@@ -43,9 +43,10 @@ class Locations {
           if (position != null) {
             var distance=Geolocator.distanceBetween(position.latitude, position.longitude,29.3083333, 30.8447222);
             print("distance    $distance");
-           // if(distance>2500){
+            if(distance>2500){
               /// out of zoon
-        //    }
+              ///
+            }
             FirebaseFirestore.instance
                 .collection('locations')
                 .doc(userID)
