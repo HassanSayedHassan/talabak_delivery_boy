@@ -99,6 +99,7 @@ class _MyApplicationState extends State<MyApplication> {
       child: Text("OK"),
       onPressed: () {
         locations.requestLocation();
+        Navigator.pop(context);
       },
     );
 

@@ -101,6 +101,7 @@ class _LogInState extends State<LogIn> {
                     postViewModel
                         .login(EmailControler.text, PassControler.text)
                         .then((value) {
+                          print('value$value');
                       Toast.show(value.status, context);
                       if (value.status == "success") {
                         Notifications notifications = new Notifications();
