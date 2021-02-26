@@ -46,9 +46,11 @@ class DeliveryTime {
           }
           break;
         case 'Monday':
-          DateTime dateStr = new DateFormat("kk:mm").parse(value.mon_st);
 
-          DateTime dateEnd = new DateFormat("kk:mm").parse(value.mon_end);
+          DateTime dateStr = new DateFormat("hh:mm").parse(value.mon_st);
+
+          DateTime dateEnd = new DateFormat("hh:mm").parse(value.mon_end);
+
           if (timeNow.isAfter(dateStr) && timeNow.isBefore(dateEnd)) {
             print('delivery boy ${value.dboyname} $nameOfDay is online');
             result = true;
@@ -58,10 +60,26 @@ class DeliveryTime {
           }
           break;
         case 'Tuesday':
-          DateTime dateStr = new DateFormat("kk:mm").parse(value.tue_st);
+          DateTime dateStr = new DateFormat("hh:mm").parse(value.tue_st);
 
-          DateTime dateEnd = new DateFormat("kk:mm").parse(value.tue_end);
-          if (timeNow.isAfter(dateStr) && timeNow.isBefore(dateEnd)) {
+          DateTime dateEnd = new DateFormat("hh:mm").parse(value.tue_end);
+
+
+          //  String string_time = new DateFormat("hh:mm").format(DateTime.now());
+          // DateTime dateTime =DateTime.now().  DateFormat("hh:mm").;
+        //  print("yessss  ${dateStr} ");
+          // print("tetrr  ${dateTime} ${value.mon_st} ");
+          if (   (DateTime.now().hour>dateStr.hour||DateTime.now().minute>dateStr.minute)  &&
+              (DateTime.now().hour<dateEnd.hour||DateTime.now().minute<dateEnd.minute)){
+            print("yessss");
+          }
+          else{
+            print("no000");
+          }
+
+
+          if ((DateTime.now().hour>dateStr.hour||DateTime.now().minute>dateStr.minute)  &&
+              (DateTime.now().hour<dateEnd.hour||DateTime.now().minute<dateEnd.minute)){
             print('delivery boy ${value.dboyname} $nameOfDay is online');
             result = true;
           } else {
