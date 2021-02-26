@@ -107,7 +107,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     });
   }
 
-  DeliveryTime deliveryTime = new DeliveryTime();
+
   @override
   void initState() {
     get_current_user();
@@ -147,52 +147,57 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                 value: status,
                                 onChanged: (value) {
                                   print("VALUE : $value");
-                                  if (value) {
+
+                                    DeliveryTime deliveryTime = new DeliveryTime();
                                     deliveryTime
                                         .getDeliveryTime(current_uid)
                                         .then((inTime) {
                                       print("in_timeeee   $inTime");
-                                      print("currennnt  $current_uid");
-                                      DateTime date = DateTime.now();
-                                      postViewModel
-                                          .deliveryBoyLogs(
-                                              phone,
-                                              name,
-                                              playerID,
-                                              'online',
-                                              'true',
-                                              current_uid,
-                                              '1',
-                                              date.toString())
-                                          .then((value) {
-                                        print('currennnt:: ${value.status}');
-                                      });
-                                      del_boy_on(current_uid);
-                                      setState(() {
-                                        status = value;
-                                      });
-                                    });
-                                  } else {
-                                    DateTime date = DateTime.now();
+                                      print("currennnt  $playerID");
+                                      if(value && inTime){
+                                        DateTime date = DateTime.now();
+                                        postViewModel
+                                            .deliveryBoyLogs(
+                                            phone,
+                                            name,
+                                            playerID,
+                                            'online',
+                                            'true',
+                                            current_uid,
+                                            '1',
+                                            date.toString())
+                                            .then((value) {
+                                          print('currennnt:: ${value.status}');
+                                        });
+                                        del_boy_on(current_uid);
+                                        setState(() {
+                                          status = value;
+                                        });
+                                      }else{
+                                        DateTime date = DateTime.now();
 
-                                    postViewModel
-                                        .deliveryBoyLogs(
+                                        postViewModel
+                                            .deliveryBoyLogs(
                                             phone,
                                             name,
                                             playerID,
                                             'offline',
                                             'true',
                                             userID,
-                                            'in zone',
+                                            '1',
                                             date.toString())
-                                        .then((value) {
-                                      print('currennnt:: ${value.status}');
+                                            .then((value) {
+                                          print('currennnt:: ${value.status}');
+                                        });
+                                        del_boy_off(current_uid);
+                                        setState(() {
+                                          status = value;
+                                        });
+
+                                      }
+
                                     });
-                                    del_boy_off(current_uid);
-                                    setState(() {
-                                      status = value;
-                                    });
-                                  }
+
                                 },
                               ),
                               SizedBox(

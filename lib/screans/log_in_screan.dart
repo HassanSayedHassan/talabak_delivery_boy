@@ -105,12 +105,12 @@ class _LogInState extends State<LogIn> {
                       Toast.show(value.status, context);
                       if (value.status == "success") {
                         Notifications notifications = new Notifications();
-                        notifications.getPlayerID().then((value) =>
+                        notifications.getPlayerID().then((value) {
                             postViewModel
                                 .updateDeliveryBoyData(EmailControler.text,
                                     PassControler.text, value, '')
                                 .then((value) {
-                                  print("valll  ${value.status}");
+                                  print("valll  ${value.playerID}");
                            ///   if (value.status == 'registeration success') {
                                 closeLoading();
                                 Navigator.pushAndRemoveUntil(context,
@@ -118,7 +118,8 @@ class _LogInState extends State<LogIn> {
                                   return HomeScrean();
                                 }), (route) => false);
                           ///    }
-                            }));
+                            });
+                        });
                       } else {
                         closeLoading();
                       }

@@ -11,6 +11,7 @@ import 'package:rating_dialog/rating_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/show_photo_in_one_screan.dart';
 import 'package:talabak_delivery_boy/utili_class.dart';
+import 'package:talabak_delivery_boy/webServices/notifications.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:talabak_delivery_boy/widgets/chat_widgets/Drow_Record.dart';
 import 'package:talabak_delivery_boy/widgets/chat_widgets/send_address.dart';
@@ -118,11 +119,23 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
       setState(() {
         flag = " ";
       });
+      postViewModel.getPlayerId(other_uid).then((value) {
+        setState(() {
+          print('in_timeeee::$value:::::$other_uid');
+          clientPlayerID = value;
+        });
+      });
     });
   }
+  Notifications notifications = new Notifications();
+  PostViewModel postViewModel = new PostViewModel();
+  String clientPlayerID = "";
   @override
   void initState() {
+
 my_init_stat();
+
+
   }
 
   refresh() {
@@ -348,6 +361,9 @@ my_init_stat();
                                     }).then((value) =>
                                             MessageControler.clear()).whenComplete(() {
                                       ///  Notification_1   هناك رساله جديده من {current_uid}    to   {other_uid}
+                                      ///
+                                      notifications.postNotification(clientPlayerID, 'هناك رساله جديده من $current_name', MessageControler.text);
+                                      print('in_timeeee::$other_uid');
 
                                     });
                                   })
@@ -1005,6 +1021,7 @@ my_init_stat();
 
   send_complain() {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (_) {
         return GestureDetector(
@@ -1014,7 +1031,7 @@ my_init_stat();
               Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
-                //  height: 200,
+                  height: 200,
                 child: TextField(
                   maxLines: 6,
                   keyboardType: TextInputType.multiline,
@@ -1052,7 +1069,7 @@ my_init_stat();
                           coplainControler.text.toString(),
                           current_uid,
                           other_uid,
-                          "user",
+                          "delivery",
                           orderId,
                           DateTime.now().toIso8601String().toString())
                       .then((value) {
@@ -1060,6 +1077,7 @@ my_init_stat();
                     HelpFun().my_Toast("تم إرسال الشكوي", context);
                     Navigator.pop(context);
                     ///  Notification_2   تم ارسال شكوي من {current_uid}    to   {master}
+                    ///notifications.postNotification('admin playerid', 'هناك شكوي موصل جديده من $current_name', MessageControler.text);
                   });
                 },
               ),
@@ -1217,6 +1235,8 @@ my_init_stat();
         closeLoading();
       }).whenComplete(() {
         ///  Notification_2   تم ارسال الفاتوره من {current_uid}    to   {other_uid}
+        notifications.postNotification(clientPlayerID, 'تم ارسال الفاتوره من $current_name', 'توجه الي المحادثه لتطلع عليها');
+        print('in_timeeee::$clientPlayerID');
       });
     } else {
       reseat_Image = null;
@@ -1275,6 +1295,8 @@ my_init_stat();
         });
       }).whenComplete(() {
         ///  Notification_4  تم قبول الطلب من {current_uid}    to   {other_uid}
+        notifications.postNotification(clientPlayerID, 'تم قبول الطلب من $current_name', 'توجه الي المحادثه اذا كنت تريد اضافه بعض الملحوظات الي الموصل');
+        print('in_timeeee::$other_uid');
       });
     }
   }
@@ -1315,6 +1337,8 @@ my_init_stat();
         });
       }).whenComplete(() {
         ///  Notification_5  تم اكتمال الطلب من {current_uid}    to   {other_uid}
+        notifications.postNotification(clientPlayerID, 'تم اكتمال الطلب من $current_name', 'توجه الي المحادثه الان');
+        print('in_timeeee::$other_uid');
       });
     }
   }

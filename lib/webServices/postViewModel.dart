@@ -53,20 +53,11 @@ class PostViewModel {
     String status = "";
     if (response.statusCode == 200) {
       if (UserModel.fromJson(convert.json.decode(response.body)).status ==
-          'registeration success') {
+          'update success') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('name',
-            UserModel.fromJson(convert.json.decode(response.body)).name);
-        prefs.setString('email',
-            UserModel.fromJson(convert.json.decode(response.body)).email);
-        prefs.setString('userID',
-            UserModel.fromJson(convert.json.decode(response.body)).userID);
-
-        prefs.setString('playerID',
+  prefs.setString('playerID',
             UserModel.fromJson(convert.json.decode(response.body)).playerID);
-        prefs.setString('phone',
-            UserModel.fromJson(convert.json.decode(response.body)).phone);
-        prefs.setString('imageURL',
+prefs.setString('imageURL',
             UserModel.fromJson(convert.json.decode(response.body)).imageUrl);
       }
       status = UserModel.fromJson(convert.json.decode(response.body)).status;
@@ -107,6 +98,18 @@ class PostViewModel {
     } else {
       return DeliveryTimeTableModel.fromJson(
           convert.json.decode(response.body));
+    }
+  }
+  Future<String> getPlayerId(String userId) async {
+    var response =
+    await http.post('$baseUrl/getPlayerIdUser.php', body: {'userId': userId});
+
+    if (response.statusCode == 200) {
+      return
+          convert.json.decode(response.body);
+    } else {
+      return
+          convert.json.decode(response.body);
     }
   }
 

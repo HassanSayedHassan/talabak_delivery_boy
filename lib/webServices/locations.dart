@@ -54,8 +54,8 @@ class Locations {
           PostViewModel postViewModel = new PostViewModel();
           DateTime date = DateTime.now();
 
-          postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
-              'false', userID, distance.toString(), date.toString());
+           postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
+               'false', userID, distance.toString(), date.toString());
 
           del_boy_off(current_uid);
         }
