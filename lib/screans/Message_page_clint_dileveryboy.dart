@@ -46,7 +46,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var appcolor_2 = Color(0xFF32065b);
   File Send_Image;
   File reseat_Image;
- // FirebaseAuth auth = FirebaseAuth.instance;
+  // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   var other_profile_image;
@@ -71,7 +71,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var order_status;
 
   num cur_orders = 0;
-
+  String adminPlayerID = "";
 
   my_init_stat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -125,17 +125,21 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
           clientPlayerID = value;
         });
       });
+      postViewModel.getPlayerIdAdmin().then((value) {
+        setState(() {
+          print('in_timeeee::$value:::::$other_uid');
+          adminPlayerID = value;
+        });
+      });
     });
   }
+
   Notifications notifications = new Notifications();
   PostViewModel postViewModel = new PostViewModel();
   String clientPlayerID = "";
   @override
   void initState() {
-
-my_init_stat();
-
-
+    my_init_stat();
   }
 
   refresh() {
@@ -224,7 +228,7 @@ my_init_stat();
                                       document.data()['message'],
                                       document.data()['sederEmail'],
                                       document.data()['data'],
-                                      )
+                                    )
                                   : document.data()['type'] == 'order'
                                       ? Drow_order(
                                           document.data()['message'],
@@ -235,28 +239,22 @@ my_init_stat();
                                               .data()['resturant_longitude'],
                                           document.data()['resturant_latitude'],
                                         )
-                              : document.data()['type'] == 'record'
-                              ? Drow_record(
-                              document.data()['message'],
-                              document.data()['sederEmail'],
-                              document.data()['data'],
-                              current_email)
-                                      : document.data()['type'] == 'end_order'
-                                          ? Drow_end_order(
+                                      : document.data()['type'] == 'record'
+                                          ? Drow_record(
                                               document.data()['message'],
                                               document.data()['sederEmail'],
                                               document.data()['data'],
-                                            )
+                                              current_email)
                                           : document.data()['type'] ==
-                                                  'accept_order'
-                                              ? Drow_accept_order(
+                                                  'end_order'
+                                              ? Drow_end_order(
                                                   document.data()['message'],
                                                   document.data()['sederEmail'],
                                                   document.data()['data'],
                                                 )
                                               : document.data()['type'] ==
-                                                      'image'
-                                                  ? DrowImage(
+                                                      'accept_order'
+                                                  ? Drow_accept_order(
                                                       document
                                                           .data()['message'],
                                                       document
@@ -264,40 +262,51 @@ my_init_stat();
                                                       document.data()['data'],
                                                     )
                                                   : document.data()['type'] ==
-                                                          'reseat-image'
-                                                      ? Drow_reseat_image(
+                                                          'image'
+                                                      ? DrowImage(
                                                           document.data()[
                                                               'message'],
                                                           document.data()[
                                                               'sederEmail'],
                                                           document
                                                               .data()['data'],
-                                                          document.data()[
-                                                              'total_price'],
-                                                          document.data()[
-                                                              'actual_price'],
-                                                          document.data()[
-                                                              'dicount_pers'],
                                                         )
                                                       : document.data()[
                                                                   'type'] ==
-                                                              'Received_order'
-                                                          ? Drow_Received_order(
+                                                              'reseat-image'
+                                                          ? Drow_reseat_image(
                                                               document.data()[
                                                                   'message'],
                                                               document.data()[
                                                                   'sederEmail'],
                                                               document.data()[
                                                                   'data'],
+                                                              document.data()[
+                                                                  'total_price'],
+                                                              document.data()[
+                                                                  'actual_price'],
+                                                              document.data()[
+                                                                  'dicount_pers'],
                                                             )
-                                                          : DrowAdress(
-                                                              document.data()[
-                                                                  'message'],
-                                                              document.data()[
-                                                                  'sederEmail'],
-                                                              document.data()[
-                                                                  'data'],
-                                                            );
+                                                          : document.data()[
+                                                                      'type'] ==
+                                                                  'Received_order'
+                                                              ? Drow_Received_order(
+                                                                  document.data()[
+                                                                      'message'],
+                                                                  document.data()[
+                                                                      'sederEmail'],
+                                                                  document.data()[
+                                                                      'data'],
+                                                                )
+                                                              : DrowAdress(
+                                                                  document.data()[
+                                                                      'message'],
+                                                                  document.data()[
+                                                                      'sederEmail'],
+                                                                  document.data()[
+                                                                      'data'],
+                                                                );
                         }).toList(),
                       ),
                     ),
@@ -307,12 +316,19 @@ my_init_stat();
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           dis_enable == false
-                              ? SendImage(current_uid,other_uid,orderId, current_email)
+                              ? SendImage(current_uid, other_uid, orderId,
+                                  current_email)
                               : SizedBox(),
                           dis_enable == false
-                              ? SendRecord(current_uid,other_uid,orderId, current_email, other_name,
-                              other_uid, other_profile_image,
-                              notifyParent: refresh)
+                              ? SendRecord(
+                                  current_uid,
+                                  other_uid,
+                                  orderId,
+                                  current_email,
+                                  other_name,
+                                  other_uid,
+                                  other_profile_image,
+                                  notifyParent: refresh)
                               : SizedBox(),
                           dis_enable == false
                               ? Expanded(
@@ -322,15 +338,17 @@ my_init_stat();
                                       decoration: InputDecoration(
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                              color: appcolor, width: size.width * (2/360.0)),
-                                          borderRadius:
-                                              BorderRadius.circular(size.width * (25/360.0)),
+                                              color: appcolor,
+                                              width: size.width * (2 / 360.0)),
+                                          borderRadius: BorderRadius.circular(
+                                              size.width * (25 / 360.0)),
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                              color: appcolor, width: size.width * (2/360.0)),
-                                          borderRadius:
-                                              BorderRadius.circular(size.width * (25/360.0)),
+                                              color: appcolor,
+                                              width: size.width * (2 / 360.0)),
+                                          borderRadius: BorderRadius.circular(
+                                              size.width * (25 / 360.0)),
                                         ),
                                         hintText: 'Type a message here..',
                                       ),
@@ -345,27 +363,31 @@ my_init_stat();
                               ? IconButton(
                                   icon: Icon(Icons.send),
                                   color: appcolor,
-                                  iconSize: size.width * (40/360.0),
+                                  iconSize: size.width * (40 / 360.0),
                                   onPressed: () {
                                     firestore
                                         .collection('orders')
                                         .doc(orderId)
                                         .collection('messages')
                                         .add({
-                                      'message': MessageControler.text,
-                                      'type': 'text',
-                                      'data': DateTime.now()
-                                          .toIso8601String()
-                                          .toString(),
-                                      'sederEmail': current_email,
-                                    }).then((value) =>
-                                            MessageControler.clear()).whenComplete(() {
-                                      ///  Notification_1   هناك رساله جديده من {current_uid}    to   {other_uid}
-                                      ///
-                                      notifications.postNotification(clientPlayerID, 'هناك رساله جديده من $current_name', MessageControler.text);
-                                      print('in_timeeee::$other_uid');
-
-                                    });
+                                          'message': MessageControler.text,
+                                          'type': 'text',
+                                          'data': DateTime.now()
+                                              .toIso8601String()
+                                              .toString(),
+                                          'sederEmail': current_email,
+                                        })
+                                        .then(
+                                            (value) => MessageControler.clear())
+                                        .whenComplete(() {
+                                          ///  Notification_1   هناك رساله جديده من {current_uid}    to   {other_uid}
+                                          ///
+                                          notifications.postNotification(
+                                              clientPlayerID,
+                                              'هناك رساله جديده من $current_name',
+                                              MessageControler.text);
+                                          print('in_timeeee::$other_uid');
+                                        });
                                   })
                               : SizedBox(),
                         ],
@@ -378,11 +400,12 @@ my_init_stat();
           );
   }
 
-
   Widget DrowMessage(message, senderEmail, data) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -390,14 +413,16 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
                 color: senderEmail == current_email ? appcolor : Colors.white,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0),
+                  horizontal: size.width * (15 / 360.0)),
               child: Column(
                 children: [
                   Text(
@@ -406,11 +431,11 @@ my_init_stat();
                       color: senderEmail == current_email
                           ? Colors.white
                           : appcolor,
-                      fontSize:  size.width * (20/360.0),
+                      fontSize: size.width * (20 / 360.0),
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (5/756.0),
+                    height: size.height * (5 / 756.0),
                   ),
                   Text(
                     getdata(data),
@@ -418,7 +443,7 @@ my_init_stat();
                         color: senderEmail == current_email
                             ? Colors.white
                             : appcolor,
-                        fontSize:  size.width * (12/360.0)),
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -435,10 +460,13 @@ my_init_stat();
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return show_photo_in_one_screan(message);}));
+          return show_photo_in_one_screan(message);
+        }));
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+        padding: EdgeInsets.symmetric(
+            vertical: size.height * (7 / 756.0),
+            horizontal: size.width * (5 / 360.0)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: senderEmail == current_email
@@ -446,19 +474,22 @@ my_init_stat();
               : CrossAxisAlignment.start,
           children: [
             Material(
-              borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+              borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
               elevation: 5,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                  borderRadius:
+                      BorderRadius.circular(size.width * (10 / 360.0)),
                   color: senderEmail == current_email ? appcolor : Colors.white,
                 ),
-                padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (5/360.0)),
+                padding: EdgeInsets.symmetric(
+                    vertical: size.height * (5 / 756.0),
+                    horizontal: size.width * (5 / 360.0)),
                 child: Column(
                   children: [
                     Container(
-                      height: size.height * (300/756.0),
-                      width: size.width * (200/360.0),
+                      height: size.height * (300 / 756.0),
+                      width: size.width * (200 / 360.0),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(message),
@@ -468,7 +499,7 @@ my_init_stat();
                       ),
                     ),
                     SizedBox(
-                      height: size.height * (10/756.0),
+                      height: size.height * (10 / 756.0),
                     ),
                     Text(
                       getdata(data),
@@ -476,7 +507,7 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (12/360.0)),
+                          fontSize: size.width * (12 / 360.0)),
                     ),
                   ],
                 ),
@@ -488,16 +519,20 @@ my_init_stat();
     );
   }
 
-  Widget Drow_reseat_image(message, senderEmail, data, total_price, actual_price, dicount_pers) {
+  Widget Drow_reseat_image(
+      message, senderEmail, data, total_price, actual_price, dicount_pers) {
     Size size = MediaQuery.of(context).size;
 
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
-          return show_photo_in_one_screan(message);}));
+          return show_photo_in_one_screan(message);
+        }));
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+        padding: EdgeInsets.symmetric(
+            vertical: size.height * (7 / 756.0),
+            horizontal: size.width * (5 / 360.0)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: senderEmail == current_email
@@ -505,19 +540,21 @@ my_init_stat();
               : CrossAxisAlignment.start,
           children: [
             Material(
-              borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+              borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
               elevation: 5,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: senderEmail == current_email ? appcolor : Colors.white,
                 ),
-                padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (5/360.0)),
+                padding: EdgeInsets.symmetric(
+                    vertical: size.height * (5 / 756.0),
+                    horizontal: size.width * (5 / 360.0)),
                 child: Column(
                   children: [
                     Container(
-                      height: size.height * (300/756.0),
-                      width: size.width * (200/360.0),
+                      height: size.height * (300 / 756.0),
+                      width: size.width * (200 / 360.0),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(message),
@@ -535,7 +572,7 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (20/360.0)),
+                          fontSize: size.width * (20 / 360.0)),
                     ),
                     Text(
                       "سعر التوصيل  = 12.0",
@@ -543,10 +580,10 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (20/360.0)),
+                          fontSize: size.width * (20 / 360.0)),
                     ),
                     SizedBox(
-                      height: size.height * (10/756.0),
+                      height: size.height * (10 / 756.0),
                     ),
                     Text(
                       "نسبه الخصم = ${dicount_pers}",
@@ -554,10 +591,10 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (20/360.0)),
+                          fontSize: size.width * (20 / 360.0)),
                     ),
                     SizedBox(
-                      height: size.height * (10/756.0),
+                      height: size.height * (10 / 756.0),
                     ),
                     Text(
                       " المبلغ بعد الخصم = ${actual_price}",
@@ -565,10 +602,10 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (20/360.0)),
+                          fontSize: size.width * (20 / 360.0)),
                     ),
                     SizedBox(
-                      height: size.height * (10/756.0),
+                      height: size.height * (10 / 756.0),
                     ),
                     Text(
                       getdata(data),
@@ -576,7 +613,7 @@ my_init_stat();
                           color: senderEmail == current_email
                               ? Colors.white
                               : appcolor,
-                          fontSize: size.width * (12/360.0)),
+                          fontSize: size.width * (12 / 360.0)),
                     ),
                   ],
                 ),
@@ -588,11 +625,14 @@ my_init_stat();
     );
   }
 
-  Widget Drow_order(message, sender_email, data, resturant_name, resturant_longitude, resturant_latitude) {
+  Widget Drow_order(message, sender_email, data, resturant_name,
+      resturant_longitude, resturant_latitude) {
     Size size = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: sender_email == current_email
@@ -600,20 +640,23 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
                 color: Colors.pinkAccent,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0),
+                  horizontal: size.width * (15 / 360.0)),
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(size.width * (8/360.0)),
+                    padding: EdgeInsets.all(size.width * (8 / 360.0)),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                      borderRadius:
+                          BorderRadius.circular(size.width * (10 / 360.0)),
                       color: Colors.white,
                     ),
                     child: Column(
@@ -622,7 +665,7 @@ my_init_stat();
                         Text(
                           'طلــــــــب جديــــد',
                           style: TextStyle(
-                              fontSize: size.width * (22/360.0),
+                              fontSize: size.width * (22 / 360.0),
                               color: Colors.pinkAccent,
                               fontWeight: FontWeight.bold),
                         ),
@@ -631,10 +674,11 @@ my_init_stat();
                           children: [
                             Flexible(
                                 child: Text(
-                                  'إسم المطعــــــــــــم',
-                                  style:
-                                  TextStyle(fontSize: size.width * (18/360.0), color: Colors.black),
-                                )),
+                              'إسم المطعــــــــــــم',
+                              style: TextStyle(
+                                  fontSize: size.width * (18 / 360.0),
+                                  color: Colors.black),
+                            )),
                             InkWell(
                                 onTap: () {
                                   if (resturant_longitude != null &&
@@ -646,7 +690,7 @@ my_init_stat();
                                 child: Icon(
                                   Icons.location_on,
                                   color: Colors.pinkAccent,
-                                  size: size.width * (38/360.0),
+                                  size: size.width * (38 / 360.0),
                                 ))
                           ],
                         )
@@ -659,11 +703,11 @@ my_init_stat();
                       color: sender_email == current_email
                           ? Colors.white
                           : appcolor,
-                      fontSize: size.width * (20/360.0),
+                      fontSize: size.width * (20 / 360.0),
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (5/756.0),
+                    height: size.height * (5 / 756.0),
                   ),
                   Text(
                     getdata(data),
@@ -671,7 +715,7 @@ my_init_stat();
                         color: sender_email == current_email
                             ? Colors.white
                             : appcolor,
-                        fontSize: size.width * (12/360.0)),
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -687,31 +731,37 @@ my_init_stat();
     return Expanded(
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+        padding: EdgeInsets.symmetric(
+            vertical: size.height * (7 / 756.0),
+            horizontal: size.width * (5 / 360.0)),
         child: Column(
           children: [
             Material(
-              borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+              borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
               elevation: 5,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                  borderRadius:
+                      BorderRadius.circular(size.width * (10 / 360.0)),
                   color: Colors.green,
                 ),
-                padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+                padding: EdgeInsets.symmetric(
+                    vertical: size.height * (5 / 756.0),
+                    horizontal: size.width * (15 / 360.0)),
                 child: Column(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(size.width * (8/360.0)),
+                      padding: EdgeInsets.all(size.width * (8 / 360.0)),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                        borderRadius:
+                            BorderRadius.circular(size.width * (10 / 360.0)),
                         color: Colors.green,
                       ),
                       child: Text(
                         'طلب مكتمل  ',
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: size.width * (26/360.0),
+                            fontSize: size.width * (26 / 360.0),
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
@@ -731,31 +781,37 @@ my_init_stat();
     return Expanded(
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+        padding: EdgeInsets.symmetric(
+            vertical: size.height * (7 / 756.0),
+            horizontal: size.width * (5 / 360.0)),
         child: Column(
           children: [
             Material(
-              borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+              borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
               elevation: 5,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                  borderRadius:
+                      BorderRadius.circular(size.width * (10 / 360.0)),
                   color: Colors.red,
                 ),
-                padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+                padding: EdgeInsets.symmetric(
+                    vertical: size.height * (5 / 756.0),
+                    horizontal: size.width * (15 / 360.0)),
                 child: Column(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(size.width * (8/360.0)),
+                      padding: EdgeInsets.all(size.width * (8 / 360.0)),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                        borderRadius:
+                            BorderRadius.circular(size.width * (10 / 360.0)),
                         color: Colors.red,
                       ),
                       child: Text(
                         'طلب ملغي ',
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: size.width * (26/360.0),
+                            fontSize: size.width * (26 / 360.0),
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
@@ -773,7 +829,9 @@ my_init_stat();
   Widget Drow_Received_order(message, senderEmail, data) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -781,15 +839,17 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               //height: 100,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
                 color: Colors.blue,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0),
+                  horizontal: size.width * (15 / 360.0)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -799,11 +859,11 @@ my_init_stat();
                       color: senderEmail == current_email
                           ? Colors.white
                           : appcolor,
-                      fontSize: size.width * (20/360.0),
+                      fontSize: size.width * (20 / 360.0),
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (5/756.0),
+                    height: size.height * (5 / 756.0),
                   ),
                   Text(
                     getdata(data),
@@ -811,7 +871,7 @@ my_init_stat();
                         color: senderEmail == current_email
                             ? Colors.white
                             : appcolor,
-                        fontSize: size.width * (12/360.0)),
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -825,7 +885,9 @@ my_init_stat();
   Widget DrowAdress(message, senderEmail, data) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -833,19 +895,20 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: senderEmail == current_email ? appcolor : Colors.white,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: 10),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0), horizontal: 10),
               child: Column(
                 children: [
                   Container(
-                    height: size.height * (200/756.0),
-                    width: size.width * (200/360.0),
+                    height: size.height * (200 / 756.0),
+                    width: size.width * (200 / 360.0),
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage("assets/images/gmap.png"),
@@ -866,13 +929,13 @@ my_init_stat();
                     icon: Icon(
                       Icons.location_on,
                       color: appcolor,
-                      size: size.width * (40/360.0),
+                      size: size.width * (40 / 360.0),
                     ),
                     label: Text('Show location'),
                     color: Color.fromRGBO(0, 0, 0, 0),
                   ),
                   SizedBox(
-                    height: size.height * (10/756.0),
+                    height: size.height * (10 / 756.0),
                   ),
                   Text(
                     getdata(data),
@@ -880,7 +943,7 @@ my_init_stat();
                         color: senderEmail == current_email
                             ? Colors.white
                             : appcolor,
-                        fontSize: size.width * (12/360.0)),
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -894,7 +957,9 @@ my_init_stat();
   Widget Drow_accept_order(message, senderEmail, data) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -902,15 +967,17 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               //height: 100,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
                 color: appcolor_2,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0),
+                  horizontal: size.width * (15 / 360.0)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -918,15 +985,17 @@ my_init_stat();
                     message,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: size.width * (20/360.0),
+                      fontSize: size.width * (20 / 360.0),
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (5/756.0),
+                    height: size.height * (5 / 756.0),
                   ),
                   Text(
                     getdata(data),
-                    style: TextStyle(color: Colors.white, fontSize: size.width * (12/360.0)),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -940,7 +1009,9 @@ my_init_stat();
   Widget Drow_end_order(message, senderEmail, data) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(
+          vertical: size.height * (7 / 756.0),
+          horizontal: size.width * (5 / 360.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -948,29 +1019,33 @@ my_init_stat();
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
             elevation: 5,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(size.width * (10 / 360.0)),
                 color: Colors.green,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (15/360.0)),
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * (5 / 756.0),
+                  horizontal: size.width * (15 / 360.0)),
               child: Column(
                 children: [
                   Text(
                     message,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: size.width * (20/360.0),
+                      fontSize: size.width * (20 / 360.0),
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (5/756.0),
+                    height: size.height * (5 / 756.0),
                   ),
                   Text(
                     getdata(data),
-                    style: TextStyle(color: Colors.white, fontSize: size.width * (12/360.0)),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size.width * (12 / 360.0)),
                   ),
                 ],
               ),
@@ -1031,7 +1106,7 @@ my_init_stat();
               Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
-                  height: 200,
+                height: 200,
                 child: TextField(
                   maxLines: 6,
                   keyboardType: TextInputType.multiline,
@@ -1076,8 +1151,12 @@ my_init_stat();
                     HelpFun().closeLoading(context);
                     HelpFun().my_Toast("تم إرسال الشكوي", context);
                     Navigator.pop(context);
+
                     ///  Notification_2   تم ارسال شكوي من {current_uid}    to   {master}
-                    ///notifications.postNotification('admin playerid', 'هناك شكوي موصل جديده من $current_name', MessageControler.text);
+                    notifications.postNotification(
+                        adminPlayerID,
+                        'هناك شكوي موصل جديده من $current_name',
+                        MessageControler.text);
                   });
                 },
               ),
@@ -1101,7 +1180,8 @@ my_init_stat();
     } else if (choice == Constants.accept_order) {
       _accept_order_fun();
     } else if (choice == Constants.share_loc) {
-      Send_Address(current_uid,other_uid,orderId, current_email, context).fun_send_address();
+      Send_Address(current_uid, other_uid, orderId, current_email, context)
+          .fun_send_address();
     }
   }
 
@@ -1235,7 +1315,10 @@ my_init_stat();
         closeLoading();
       }).whenComplete(() {
         ///  Notification_2   تم ارسال الفاتوره من {current_uid}    to   {other_uid}
-        notifications.postNotification(clientPlayerID, 'تم ارسال الفاتوره من $current_name', 'توجه الي المحادثه لتطلع عليها');
+        notifications.postNotification(
+            clientPlayerID,
+            'تم ارسال الفاتوره من $current_name',
+            'توجه الي المحادثه لتطلع عليها');
         print('in_timeeee::$clientPlayerID');
       });
     } else {
@@ -1295,7 +1378,10 @@ my_init_stat();
         });
       }).whenComplete(() {
         ///  Notification_4  تم قبول الطلب من {current_uid}    to   {other_uid}
-        notifications.postNotification(clientPlayerID, 'تم قبول الطلب من $current_name', 'توجه الي المحادثه اذا كنت تريد اضافه بعض الملحوظات الي الموصل');
+        notifications.postNotification(
+            clientPlayerID,
+            'تم قبول الطلب من $current_name',
+            'توجه الي المحادثه اذا كنت تريد اضافه بعض الملحوظات الي الموصل');
         print('in_timeeee::$other_uid');
       });
     }
@@ -1337,7 +1423,8 @@ my_init_stat();
         });
       }).whenComplete(() {
         ///  Notification_5  تم اكتمال الطلب من {current_uid}    to   {other_uid}
-        notifications.postNotification(clientPlayerID, 'تم اكتمال الطلب من $current_name', 'توجه الي المحادثه الان');
+        notifications.postNotification(clientPlayerID,
+            'تم اكتمال الطلب من $current_name', 'توجه الي المحادثه الان');
         print('in_timeeee::$other_uid');
       });
     }

@@ -55,9 +55,9 @@ class PostViewModel {
       if (UserModel.fromJson(convert.json.decode(response.body)).status ==
           'update success') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('playerID',
+        prefs.setString('playerID',
             UserModel.fromJson(convert.json.decode(response.body)).playerID);
-prefs.setString('imageURL',
+        prefs.setString('imageURL',
             UserModel.fromJson(convert.json.decode(response.body)).imageUrl);
       }
       status = UserModel.fromJson(convert.json.decode(response.body)).status;
@@ -100,16 +100,25 @@ prefs.setString('imageURL',
           convert.json.decode(response.body));
     }
   }
+
   Future<String> getPlayerId(String userId) async {
-    var response =
-    await http.post('$baseUrl/getPlayerIdUser.php', body: {'userId': userId});
+    var response = await http
+        .post('$baseUrl/getPlayerIdUser.php', body: {'userId': userId});
 
     if (response.statusCode == 200) {
-      return
-          convert.json.decode(response.body);
+      return convert.json.decode(response.body);
     } else {
-      return
-          convert.json.decode(response.body);
+      return convert.json.decode(response.body);
+    }
+  }
+
+  Future<String> getPlayerIdAdmin() async {
+    var response = await http.post('$baseUrl/getPlayerIdAdmin.php');
+
+    if (response.statusCode == 200) {
+      return convert.json.decode(response.body);
+    } else {
+      return convert.json.decode(response.body);
     }
   }
 

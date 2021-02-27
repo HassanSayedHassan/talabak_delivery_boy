@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,13 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:talabak_delivery_boy/webServices/notifications.dart';
+import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:toast/toast.dart';
 
 class SendImage extends StatefulWidget {
-  var channelId,current_email,current_uid,other_uid;
-  SendImage(this.current_uid,this.other_uid,this.channelId,this.current_email);
+  var channelId, current_email, current_uid, other_uid;
+  SendImage(
+      this.current_uid, this.other_uid, this.channelId, this.current_email);
   @override
-  _SendImageState createState() => _SendImageState(channelId,current_email);
+  _SendImageState createState() => _SendImageState(channelId, current_email);
 }
 
 class _SendImageState extends State<SendImage> {
@@ -25,7 +27,20 @@ class _SendImageState extends State<SendImage> {
   File Send_Image;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  PostViewModel postViewModel = new PostViewModel();
 
+  Notifications notification = new Notifications();
+  String deliveryPlayerId = "";
+  @override
+  void initState() {
+    postViewModel.getPlayerId(widget.other_uid).then((value) {
+      setState(() {
+        deliveryPlayerId = value;
+      });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,23 +64,15 @@ class _SendImageState extends State<SendImage> {
             context: context,
             barrierDismissible: true,
             barrierLabel:
-            MaterialLocalizations
-                .of(context)
-                .modalBarrierDismissLabel,
+                MaterialLocalizations.of(context).modalBarrierDismissLabel,
             barrierColor: Colors.black45,
             transitionDuration: const Duration(milliseconds: 200),
             pageBuilder: (BuildContext buildContext, Animation animation,
                 Animation secondaryAnimation) {
               return Center(
                 child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width - 10,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height - 250,
+                  width: MediaQuery.of(context).size.width - 10,
+                  height: MediaQuery.of(context).size.height - 250,
                   padding: EdgeInsets.all(20),
                   color: Colors.white,
                   child: Column(
@@ -83,7 +90,6 @@ class _SendImageState extends State<SendImage> {
                       ),
                       RaisedButton(
                         onPressed: () {
-
                           uploadIage(Send_Image);
                         },
                         child: Text(
@@ -102,12 +108,12 @@ class _SendImageState extends State<SendImage> {
   }
 
   uploadIage(File image) async {
-    var stats=false;
+    var stats = false;
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      stats=true;
+      stats = true;
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      stats= true;
+      stats = true;
     }
     if (stats) {
       Navigator.of(context).pop();
@@ -121,11 +127,7 @@ class _SendImageState extends State<SendImage> {
 
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       final url = await firebaseStorageRef.getDownloadURL();
-      firestore
-          .collection('orders')
-          .doc(channelId)
-          .collection('messages')
-          .add({
+      firestore.collection('orders').doc(channelId).collection('messages').add({
         'message': url,
         'type': 'image',
         'data': DateTime.now().toIso8601String().toString(),
@@ -135,9 +137,10 @@ class _SendImageState extends State<SendImage> {
         closeLoading();
       }).whenComplete(() {
         ///  Notification_1   تم ارسال صوره من {current_uid}    to   {other_uid}
+        notification.postNotification(deliveryPlayerId,
+            'تم ارسال صوره من $current_email', 'تم ارسال صوره');
       });
-    }
-    else{
+    } else {
       Send_Image = null;
       closeLoading();
       my_Toast('تأكد من الاتصال بالنترنت');
@@ -157,7 +160,9 @@ class _SendImageState extends State<SendImage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 new CircularProgressIndicator(
-                  strokeWidth: 5, backgroundColor: appcolor,),
+                  strokeWidth: 5,
+                  backgroundColor: appcolor,
+                ),
                 new Text("Loading..."),
               ],
             ),
@@ -166,9 +171,11 @@ class _SendImageState extends State<SendImage> {
       },
     );
   }
+
   void closeLoading() {
     Navigator.pop(context);
   }
+
   void my_Toast(String mess) {
     Toast.show(mess, context,
         duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -180,8 +187,7 @@ class _SendImageState extends State<SendImage> {
       return true;
     } else if (connectivityResult == ConnectivityResult.wifi) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
