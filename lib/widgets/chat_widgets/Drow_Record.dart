@@ -18,7 +18,7 @@ class _Drow_recordState extends State<Drow_record> {
   bool _play = false;
   bool isPlaying=false;
 
-  double _sliderValue;
+  double _sliderValue=0.0;
   bool _userIsMovingSlider;
   Duration _currentTime;
   Duration _totalTime;
@@ -32,12 +32,11 @@ class _Drow_recordState extends State<Drow_record> {
   }
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     if (!_userIsMovingSlider) {
       _sliderValue = _getSliderValue();
     }
     return Container(
-      padding: EdgeInsets.symmetric(vertical: size.height * (7/756.0), horizontal: size.width * (5/360.0)),
+      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: senderEmail == current_email
@@ -45,14 +44,14 @@ class _Drow_recordState extends State<Drow_record> {
             : CrossAxisAlignment.start,
         children: [
           Material(
-            borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+            borderRadius: BorderRadius.circular(10),
             elevation: 5,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.width * (10/360.0)),
+                borderRadius: BorderRadius.circular(10),
                 color: senderEmail == current_email ? appcolor : Colors.white,
               ),
-              padding: EdgeInsets.symmetric(vertical: size.height * (5/756.0), horizontal: size.width * (5/360.0)),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
               child: Column(
                 children: [
                   Card(
@@ -86,16 +85,24 @@ class _Drow_recordState extends State<Drow_record> {
                                 });
                               },
                               onFinished: (){
+
                                 setState(() {
+                                  print("funushshshshsh");
                                   _play=false;
+
                                 });
                               },
                             ),
                             Slider(
-                              value: _sliderValue ,
-                              activeColor: Theme.of(context).textTheme.bodyText2.color,
-                              inactiveColor: Theme.of(context).disabledColor,
+                              value: _sliderValue,
+                             // min: 0,
+                            //  max: _totalTime==null?0:_totalTime.inSeconds.toDouble(),
+                             // divisions: 5,
+                            //  label: _sliderValue.round().toString(),
+                              activeColor: Colors.black,
+                              inactiveColor: Colors.black26,
                               onChangeStart: (value) {
+                                print("_sliderValue_sliderValue $_sliderValue");
                                 _userIsMovingSlider = true;
                               },
                               // 2
@@ -117,7 +124,7 @@ class _Drow_recordState extends State<Drow_record> {
                     ),
                   ),
                   SizedBox(
-                    height: size.height * (10/756.0),
+                    height: 10,
                   ),
                   Text(
                     getdata(data),
@@ -125,7 +132,7 @@ class _Drow_recordState extends State<Drow_record> {
                         color: senderEmail == current_email
                             ? Colors.white
                             : appcolor,
-                        fontSize: size.width * (12/360.0)),
+                        fontSize: 12),
                   ),
                 ],
               ),
@@ -141,7 +148,8 @@ class _Drow_recordState extends State<Drow_record> {
       return 0;
     }
 
-    return _currentTime.inMilliseconds / _totalTime.inMilliseconds;
+    return 1;
+     /// _currentTime.inSeconds / _totalTime.inSeconds;
   }
 
   Duration _getDuration(double sliderValue) {

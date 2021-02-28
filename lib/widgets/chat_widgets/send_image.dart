@@ -33,11 +33,11 @@ class _SendImageState extends State<SendImage> {
   String deliveryPlayerId = "";
   @override
   void initState() {
-    postViewModel.getPlayerId(widget.other_uid).then((value) {
-      setState(() {
-        deliveryPlayerId = value;
-      });
-    });
+  ///  postViewModel.getPlayerId(widget.other_uid).then((value) {
+  ///    setState(() {
+ ///       deliveryPlayerId = value;
+  ///    });
+///    });
 
     super.initState();
   }
