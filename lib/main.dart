@@ -21,13 +21,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Notifications notifications;
-  var current_name;
+  SharedPreferences getUserData;
+  Future<SharedPreferences> preferences = SharedPreferences.getInstance();
+  String name = "";
+  Widget app = HomeScrean();
 
+  var current_name;
   Future check_current_user() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     current_name = prefs.getString( 'name' );
+    if (current_name == ""||current_name==null) {
+      setState(() {
+        app = LogIn();
+      });
+    }
   }
-
   @override
   Future<void> initState()  {
     check_current_user();
@@ -45,12 +53,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)  {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Your Order',
+      title: 'طلبك_الموصل ',
       home: MyApplication(
-        app: current_name==""? LogIn():current_name==null? LogIn():HomeScrean(),
+        app: app,
       ),
       routes: {
         'homeScrean': (context) => new HomeScrean(),
