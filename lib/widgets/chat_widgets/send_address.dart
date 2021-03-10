@@ -121,8 +121,8 @@ class Send_Address {
                                   ///  Notification_1  تم مشاركه الموقع من {widget.current_uid}    to   {widget.other_uid}
                                   notification.postNotification(
                                       deliveryPlayerId,
-                                      'تم مشاركة الموقع من $current_email',
-                                      'تم مشاركة الموقع');
+                                      'location shared from $current_email',
+                                      'the location is shared please check the chat');
                                 });
                           } else {
                             closeLoading();

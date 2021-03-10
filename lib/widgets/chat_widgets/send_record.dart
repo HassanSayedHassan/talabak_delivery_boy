@@ -247,7 +247,7 @@ class _SendRecordState extends State<SendRecord> {
       }).whenComplete(() {
         ///  Notification_1  تم ارسال مقطع صوتي من {widget.current_uid}    to   {widget.other_uid}
         notification.postNotification(deliveryPlayerId,
-            'هناك رساله صوتيه من $current_email', 'هناك رساله صوتيه');
+            'voice note from $current_email', 'voice note is sended please go to chat to check it');
       });
     } else {
       closeLoading();

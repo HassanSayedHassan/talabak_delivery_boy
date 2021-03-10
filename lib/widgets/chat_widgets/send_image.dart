@@ -138,7 +138,7 @@ class _SendImageState extends State<SendImage> {
       }).whenComplete(() {
         ///  Notification_1   تم ارسال صوره من {current_uid}    to   {other_uid}
         notification.postNotification(deliveryPlayerId,
-            'تم ارسال صوره من $current_email', 'تم ارسال صوره');
+            'image send from $current_email', 'image is sended please go to chat to review it');
       });
     } else {
       Send_Image = null;
