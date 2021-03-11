@@ -22,6 +22,8 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
   var appcolor=Color(0xFF12c0c7);
   List<String> my_orders=[];
 
+  var flag="123";
+
   var current_uid;
   getshareschat() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -37,6 +39,10 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
           });
         }
       })
+    }).whenComplete(() {
+      setState(() {
+        flag="";
+      });
     });
   }
     @override
@@ -47,13 +53,17 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
     }
   @override
   Widget build(BuildContext context) {
-    return
-      my_orders.length==0?
-      Scaffold(
+    return flag=="123"?  Scaffold(
         body:Center(
           child: CircularProgressIndicator(strokeWidth: 5,backgroundColor: appcolor,),
         )
-    )
+    ):
+      my_orders.length==0?
+      Scaffold(
+        body: Center(
+          child: Text('لا توجد طلبات حتي الان'),
+        ),
+      )
     :
       Scaffold(
           body: StreamBuilder<QuerySnapshot>(
