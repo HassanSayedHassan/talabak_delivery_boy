@@ -36,7 +36,7 @@ class Message_Dilevery_Clint extends StatefulWidget {
 class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var clint_uid;
   var orderId;
-  var discount_pers = 20;
+  var discount_pers = 0;
   var total_price = 0.0;
   var actual_price = 0.0;
 
@@ -111,7 +111,9 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
             finish_time = documentSnapshot.get('finish_time');
             order_status = documentSnapshot.get('order_status');
             //   send_time= documentSnapshot.get('send_time');
-            discount_pers = documentSnapshot.get('discount_pers');
+           // print("discount_persdiscount_pers ${documentSnapshot.get('discount_pers')}");
+            discount_pers = documentSnapshot.get('discount_pers')!=null?documentSnapshot.get('discount_pers'):0;
+
           });
         }
       });
@@ -149,7 +151,13 @@ my_init_stat();
     setState(() {});
     Navigator.pop(context);
   }
+  show_ind(){
+    Toast.show("بدأ تسجيل رساله صوتية", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER,backgroundColor:Colors.green );
 
+  }
+  hid_ind(){
+    Toast.show("انتهاء تسجيل رساله صوتية", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER,backgroundColor:Colors.blue );
+  }
   @override
   Widget build(BuildContext context) {
    // Size size = MediaQuery.of(context).size;
@@ -312,7 +320,8 @@ my_init_stat();
                           dis_enable == false
                               ? SendRecord(current_uid,other_uid,orderId, current_email, other_name,
                               other_uid, other_profile_image,
-                              notifyParent: refresh)
+                              notifyParent: refresh,show_ind:show_ind,
+                              hid_ind:hid_ind)
                               : SizedBox(),
                           dis_enable == false
                               ? Expanded(
@@ -534,8 +543,7 @@ my_init_stat();
     );
   }
 
-  Widget Drow_reseat_image(
-      message, senderEmail, data, total_price, actual_price, dicount_pers) {
+  Widget Drow_reseat_image(message, senderEmail, data, total_price, actual_price, dicount_pers) {
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (c) {
@@ -577,6 +585,14 @@ my_init_stat();
                     ),
                     Text(
                       "المبلغ الكلي = ${total_price}",
+                      style: TextStyle(
+                          color: senderEmail == current_email
+                              ? Colors.white
+                              : appcolor,
+                          fontSize: 20),
+                    ),
+                    Text(
+                      "سعر التوصيل  = 12.0",
                       style: TextStyle(
                           color: senderEmail == current_email
                               ? Colors.white
@@ -1115,16 +1131,15 @@ my_init_stat();
                         controller: priseControler,
                         onChanged: (val) {
                           setState(() {
-                            print(int.parse(priseControler.text.toString()));
-                            var total_dic = (discount_pers / 100) *
-                                int.parse(priseControler.text.toString());
+                          //  print(int.parse(priseControler.text.toString()));
+                             total_price = double.parse(priseControler.text.toString());
 
-                            total_price =
-                                double.parse(priseControler.text.toString());
-                            actual_price =
-                                double.parse(priseControler.text.toString()) -
-                                    total_dic +
-                                    12;
+                            var total_discount=12-(discount_pers/100.0)*12;
+                            actual_price = total_price + total_discount;
+
+
+                          //  total_price = double.parse(priseControler.text.toString());
+
                             //  print(total_price);
                           });
                         },

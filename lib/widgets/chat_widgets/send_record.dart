@@ -23,11 +23,13 @@ class SendRecord extends StatefulWidget {
   var name;
   var uid, current_uid, other_uid;
   var profile_image;
+  final Function() show_ind;
+  final Function() hid_ind;
   final LocalFileSystem localFileSystem;
   final Function() notifyParent;
   SendRecord(this.current_uid, this.other_uid, this.channelId,
       this.current_email, this.name, this.uid, this.profile_image,
-      {localFileSystem, Key key, @required this.notifyParent})
+      {localFileSystem, Key key, @required this.notifyParent,@required this.show_ind,@required this.hid_ind})
       : this.localFileSystem = localFileSystem ?? LocalFileSystem(),
         super(key: key);
 
@@ -99,6 +101,7 @@ class _SendRecordState extends State<SendRecord> {
       // var status = await Permission.microphone.request().isGranted;
       if (await Permission.microphone.request().isGranted) {
         // We didn't ask for permission yet.
+        widget.show_ind();
         ///}
         ///if (true) {
         String path = DateTime.now().toString();
@@ -126,6 +129,7 @@ class _SendRecordState extends State<SendRecord> {
   }
 
   _stop() async {
+    widget.hid_ind();
     var recording = await AudioRecorder.stop();
     print("Stop recording: ${recording.path}");
     bool isRecording = await AudioRecorder.isRecording;
