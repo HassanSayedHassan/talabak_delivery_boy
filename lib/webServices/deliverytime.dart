@@ -8,8 +8,8 @@ class DeliveryTime {
   Future<bool> getDeliveryTime(String dboyid) async {
     print('delivery boy $dboyid ');
     await postViewModel.getDeliveryTime(dboyid).then((value) {
-      String nameOfDay =
-          DateFormat('EEEE').format(DateTime.now()).toString().trim();
+
+      String nameOfDay = DateFormat('EEEE').format(DateTime.now()).toString().trim();
 
       DateFormat dateFormat = DateFormat("HH:mm");
       String startime = dateFormat.format(DateTime.now());
@@ -22,15 +22,13 @@ class DeliveryTime {
 
           DateTime dateEnd = new DateFormat("HH:mm").parse(value.sat_end);
 
-          print(
-              'delivery boy ${timeNow.difference(dateEnd).isNegative} ${timeNow.difference(dateStr).isNegative} ');
+          print('delivery boy ${timeNow.difference(dateEnd).isNegative} ${timeNow.difference(dateStr).isNegative} ');
 
-          if (   (DateTime.now().hour>dateStr.hour)  &&
-              (DateTime.now().hour<dateEnd.hour)){
+          if (   (DateTime.now().hour>dateStr.hour)  && (DateTime.now().hour<dateEnd.hour)){
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -49,7 +47,7 @@ class DeliveryTime {
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -70,7 +68,7 @@ class DeliveryTime {
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -86,16 +84,24 @@ class DeliveryTime {
           DateTime dateEnd = new DateFormat("HH:mm").parse(value.tue_end);
 
 
+          print("dateStrdateStr ${dateStr.hour}   ${dateStr.minute}");
+          print("dateEnddateEnd ${value.tue_end}   ${dateEnd.minute}");
+
+          print("nowhour  ${DateTime.now().hour} ");
+          print("nowmin  ${DateTime.now().minute} ");
+
           //  String string_time = new DateFormat("hh:mm").format(DateTime.now());
           // DateTime dateTime =DateTime.now().  DateFormat("hh:mm").;
         //  print("yessss  ${dateStr} ");
           // print("tetrr  ${dateTime} ${value.mon_st} ");
-          if (   (DateTime.now().hour>dateStr.hour)  &&
-              (DateTime.now().hour<dateEnd.hour)){
+
+
+
+          if ( (DateTime.now().hour>dateStr.hour)  && (DateTime.now().hour<dateEnd.hour)){
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -116,7 +122,7 @@ class DeliveryTime {
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -135,7 +141,7 @@ class DeliveryTime {
 
             print("yessss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessss");
             return result = true;
@@ -155,7 +161,7 @@ class DeliveryTime {
 
             print("yesss");
             return result = true;
-          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  ||
+          } else if (   (DateTime.now().hour==dateStr.hour && DateTime.now().minute > dateStr.minute  )  &&
               (DateTime.now().hour==dateEnd.hour && DateTime.now().minute < dateEnd.minute  ) ){
             print("yessssss");
             return result = true;

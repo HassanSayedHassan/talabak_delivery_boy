@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/Edit_profile.dart';
 import 'package:talabak_delivery_boy/screans/log_in_screan.dart';
 import 'package:talabak_delivery_boy/webServices/deliverytime.dart';
+import 'package:talabak_delivery_boy/webServices/fire_base_deliverytime.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:toast/toast.dart';
@@ -80,7 +81,12 @@ class _Profile_ScreansState extends State<Profile_Screan> {
           });
         }
       });
+    }).whenComplete(() {
+      setState(() {
+        flag = "";
+      });
     });
+
     postViewModel.getDeliveryBoyRate(current_uid).then((value) {
       setState(() {
         if (value == null) {
@@ -90,20 +96,16 @@ class _Profile_ScreansState extends State<Profile_Screan> {
         }
       });
     });
+
     firestore
         .collection('delivery_boys')
-        .doc(current_uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
+        .doc(current_uid).snapshots()
+        .listen((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
         setState(() {
           status = documentSnapshot.get('status');
         });
       }
-    }).whenComplete(() {
-      setState(() {
-        flag = "";
-      });
     });
   }
 
@@ -145,12 +147,12 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                               CustomSwitch(
                                 activeColor: Colors.green,
                                 value: status,
-                                onChanged: (value) {
-                                  print("VALUE : $value");
+                                onChanged: (value) async {
+                                  print("VALUE123 : $value");
 
                                     DeliveryTime deliveryTime = new DeliveryTime();
-                                    deliveryTime
-                                        .getDeliveryTime(current_uid)
+                                 await Fire_baseDeliveryTime()
+                                        .fire_base_getDeliveryTime(current_uid)
                                         .then((inTime) {
                                       print("in_timeeee   $inTime");
                                       print("currennnt  $playerID");
@@ -172,12 +174,12 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                         del_boy_on(current_uid);
                                         setState(() {
                                           status = value;
+                                          print('currennnt:set 1');
                                         });
-                                      }else{
+                                      }else if (value==false){
                                         DateTime date = DateTime.now();
 
-                                        postViewModel
-                                            .deliveryBoyLogs(
+                                        postViewModel.deliveryBoyLogs(
                                             phone,
                                             name,
                                             playerID,
@@ -192,6 +194,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                         del_boy_off(current_uid);
                                         setState(() {
                                           status = value;
+                                          print('currennnt:set 2');
                                         });
 
                                       }
