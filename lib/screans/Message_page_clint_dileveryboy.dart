@@ -70,7 +70,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var finish_time;
   var order_status;
 
-  num cur_orders = 0;
+  int cur_orders = 0;
 
 
   my_init_stat() async {
@@ -1277,18 +1277,8 @@ my_init_stat();
         }).whenComplete(() {
           firestore
               .collection('delivery_boys')
-              .doc(current_uid)
-              .get()
-              .then((DocumentSnapshot documentSnapshot) {
-            if (documentSnapshot.exists) {
-              setState(() {
-                cur_orders = documentSnapshot.get('current_orders');
-              });
-            }
-          });
-        }).whenComplete(() {
-          firestore.collection('delivery_boys').doc(current_uid).update({
-            "current_orders": cur_orders + 1,
+              .doc(current_uid).update({
+            "current_orders":FieldValue.increment(1)
           });
         });
       }).whenComplete(() {
@@ -1315,28 +1305,17 @@ my_init_stat();
           "dis_enable": true,
           "finish_time": DateTime.now().toIso8601String().toString()
         }).whenComplete(() {
-          _Show_rates_dialog();
+          firestore
+              .collection('delivery_boys')
+              .doc(current_uid).update({
+            "current_orders":FieldValue.increment(-1)
+          }).whenComplete(() {
+            ///  Notification_5  تم اكتمال الطلب من {current_uid}    to   {other_uid}
+            notifications.postNotification(clientPlayerID, 'the order is done $current_name', 'go to chat now');
+            print('in_timeeee::$other_uid');
+          });
         });
-      }).whenComplete(() {
-        firestore
-            .collection('delivery_boys')
-            .doc(current_uid)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            setState(() {
-              cur_orders = documentSnapshot.get('current_orders');
-            });
-          }
-        });
-      }).whenComplete(() {
-        firestore.collection('delivery_boys').doc(current_uid).update({
-          "current_orders": cur_orders - 1,
-        });
-      }).whenComplete(() {
-        ///  Notification_5  تم اكتمال الطلب من {current_uid}    to   {other_uid}
-        notifications.postNotification(clientPlayerID, 'the order is done $current_name', 'go to chat now');
-        print('in_timeeee::$other_uid');
+
       });
     }
   }
