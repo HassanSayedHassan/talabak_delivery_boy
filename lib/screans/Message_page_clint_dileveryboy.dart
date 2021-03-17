@@ -728,14 +728,14 @@ my_init_stat();
                           children: [
                             Flexible(
                                 child: Text(
-                                  'إسم المطعــــــــــــم',
+                                  resturant_name!=null?resturant_name:"اسم المطعم",
                                   style:
                                   TextStyle(fontSize: 18, color: Colors.black),
                                 )),
                             InkWell(
                                 onTap: () {
-                                  if (resturant_longitude != null &&
-                                      resturant_latitude != null) {
+                                  print("resturant_longitude $resturant_longitude  ");
+                                  if (resturant_longitude != null && resturant_latitude != null) {
                                     _launchURL(
                                         'http://maps.google.com/maps?q=${resturant_longitude},${resturant_latitude}+(My+Point)&z=16&ll=${resturant_longitude},${resturant_latitude}');
                                   }

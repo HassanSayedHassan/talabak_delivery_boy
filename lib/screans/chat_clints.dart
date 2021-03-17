@@ -67,7 +67,7 @@ class _Chat_With_ClintsState extends State<Chat_With_Clints> {
     :
       Scaffold(
           body: StreamBuilder<QuerySnapshot>(
-            stream: users.snapshots(),
+            stream: users.orderBy("send_time", descending: true).snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
