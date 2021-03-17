@@ -37,7 +37,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   bool beOffline = false;
   Locations locations = new Locations();
   var appcolor = Color(0xFF12c0c7);
-  var rates;
+  double  rates = 0.0;
   String userID;
 
   var flag = "123";
@@ -89,11 +89,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
     postViewModel.getDeliveryBoyRate(current_uid).then((value) {
       setState(() {
-        if (value == null) {
-          rates = "0";
-        } else {
-          rates = value;
-        }
+        rates = value;
       });
     });
 
@@ -229,7 +225,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   ),
                                   RatingBarIndicator(
                                     rating:
-                                        rates == null ? 0 : double.parse(rates),
+                                        rates ,
                                     itemBuilder: (context, index) => Icon(
                                       Icons.star,
                                       color: Colors.amber,
@@ -249,7 +245,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   //backgroundColor: const Color(0xFF03144c),
                                   child: CircleAvatar(
                                     radius: size.width * (45 / 360.0),
-                                    backgroundImage: profile_image != null
+                                    backgroundImage: profile_image.isNotEmpty
                                         ? NetworkImage(profile_image)
                                         : AssetImage('assets/images/ep.jpg'),
                                   ),

@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:talabak_delivery_boy/models/complaintModel.dart';
 import 'package:talabak_delivery_boy/models/deliveryTimeTableModel.dart';
+import 'package:talabak_delivery_boy/models/rateDBModel.dart';
 import 'package:talabak_delivery_boy/models/rateModel.dart';
 import 'package:talabak_delivery_boy/models/userModel.dart';
 
@@ -133,14 +134,16 @@ class PostViewModel {
     }
   }
 
-  Future<String> getDeliveryBoyRate(String dboyid) async {
+
+  Future<double> getDeliveryBoyRate(String dboyid) async {
     var response =
-        await http.post('$baseUrl/avgrate.php', body: {'dboyID': dboyid});
+    await http.post('$baseUrl/DBRateAvg.php', body: {'deliveryBoyID': dboyid});
 
     if (response.statusCode == 200) {
-      return RateModel.fromJson(convert.json.decode(response.body)).rate;
+      return double.parse(RateDBModel.fromJson(convert.json.decode(response.body)).rating);
     } else {
-      return RateModel.fromJson(convert.json.decode(response.body)).rate;
+      return double.parse(RateDBModel.fromJson(convert.json.decode(response.body)).rating);
+
     }
   }
 
