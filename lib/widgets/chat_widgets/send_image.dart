@@ -25,7 +25,7 @@ class _SendImageState extends State<SendImage> {
 
   var appcolor = Color(0xFF12c0c7);
   File Send_Image;
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   PostViewModel postViewModel = new PostViewModel();
 
@@ -120,7 +120,7 @@ class _SendImageState extends State<SendImage> {
       startLoading();
       StorageReference firebaseStorageRef = FirebaseStorage.instance
           .ref()
-          .child('${auth.currentUser.uid}/chats')
+          .child('${widget.current_uid}/chats')
           .child(channelId)
           .child(DateTime.now().toString());
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(image);

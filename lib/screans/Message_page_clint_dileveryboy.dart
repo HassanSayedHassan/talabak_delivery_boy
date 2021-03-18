@@ -69,7 +69,7 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var received_time;
   var finish_time;
   var order_status;
-
+var take_reseat=false;
   int cur_orders = 0;
 
 
@@ -112,6 +112,9 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
             order_status = documentSnapshot.get('order_status');
             //   send_time= documentSnapshot.get('send_time');
            // print("discount_persdiscount_pers ${documentSnapshot.get('discount_pers')}");
+
+            take_reseat=documentSnapshot.get('take_reseat');
+
             discount_pers = documentSnapshot.get('discount_pers')!=null?documentSnapshot.get('discount_pers'):0;
 
           });
@@ -685,8 +688,7 @@ my_init_stat();
     );
   }
 
-  Widget Drow_order(message, sender_email, data, resturant_name,
-      resturant_longitude, resturant_latitude) {
+  Widget Drow_order(message, sender_email, data, resturant_name, resturant_longitude, resturant_latitude) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
@@ -1226,11 +1228,16 @@ my_init_stat();
         'total_price': total_price,
         'dicount_pers': discount_pers,
         'actual_price': actual_price,
+
         'data': DateTime.now().toIso8601String().toString(),
         'sederEmail': current_email,
       }).then((value) {
         reseat_Image = null;
         closeLoading();
+      }).whenComplete(() {
+        firestore.collection('orders').doc(orderId).update({
+          "take_reseat":true,
+        });
       }).whenComplete(() {
         ///  Notification_2   تم ارسال الفاتوره من {current_uid}    to   {other_uid}
         notifications.postNotification(clientPlayerID, 'the check has been sended $current_name', 'go to chat to review it');
@@ -1290,10 +1297,7 @@ my_init_stat();
   }
 
   void _finish_order_fun() {
-    if (dis_enable == false &&
-        accept_order != "" &&
-        received_time != "" &&
-        finish_time == "") {
+    if (dis_enable == false && accept_order != "" && take_reseat && finish_time == "") {
       firestore.collection('orders').doc(orderId).collection('messages').add({
         'message': 'تم انهاء الطلب',
         'type': 'end_order',

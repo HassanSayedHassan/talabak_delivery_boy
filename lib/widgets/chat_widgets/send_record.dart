@@ -45,7 +45,7 @@ class _SendRecordState extends State<SendRecord> {
   var channelId, current_email;
   _SendRecordState(this.channelId, this.current_email, this.name, this.uid,
       this.profile_image);
-  FirebaseAuth auth = FirebaseAuth.instance;
+ // FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   var appcolor = Color(0xFF12c0c7);
   Recording _recording = new Recording();
@@ -232,7 +232,7 @@ class _SendRecordState extends State<SendRecord> {
       startLoading();
       StorageReference firebaseStorageRef = FirebaseStorage.instance
           .ref()
-          .child('${auth.currentUser.uid}/chats')
+          .child('${widget.current_uid}/chats')
           .child(channelId)
           .child(DateTime.now().toString());
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(file);
