@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/Edit_profile.dart';
 import 'package:talabak_delivery_boy/screans/log_in_screan.dart';
+import 'package:talabak_delivery_boy/utili_class.dart';
 import 'package:talabak_delivery_boy/webServices/deliverytime.dart';
 import 'package:talabak_delivery_boy/webServices/fire_base_deliverytime.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
@@ -146,13 +147,15 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                 onChanged: (value) async {
                                   print("VALUE123 : $value");
 
-                                    DeliveryTime deliveryTime = new DeliveryTime();
-                                 await Fire_baseDeliveryTime()
+                                   // DeliveryTime deliveryTime = new DeliveryTime();
+
+                                  if (value){
+                                    await Fire_baseDeliveryTime()
                                         .fire_base_getDeliveryTime(current_uid)
                                         .then((inTime) {
                                       print("in_timeeee   $inTime");
                                       print("currennnt  $playerID");
-                                      if(value && inTime){
+                                      if(inTime){
                                         DateTime date = DateTime.now();
                                         postViewModel
                                             .deliveryBoyLogs(
@@ -172,7 +175,15 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                           status = value;
                                           print('currennnt:set 1');
                                         });
-                                      }else if (value==false){
+                                      }else
+                                        {
+                                          HelpFun().my_Toast("عفوا انت لست في مواعيد العمل المحدده لك", context);
+                                        }
+                                    });
+
+                                  }
+
+                                      else if (value==false){
                                         DateTime date = DateTime.now();
 
                                         postViewModel.deliveryBoyLogs(
@@ -195,7 +206,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
 
                                       }
 
-                                    });
+
 
                                 },
                               ),
@@ -245,9 +256,9 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                   //backgroundColor: const Color(0xFF03144c),
                                   child: CircleAvatar(
                                     radius: size.width * (45 / 360.0),
-                                    backgroundImage: profile_image.isNotEmpty
-                                        ? NetworkImage(profile_image)
-                                        : AssetImage('assets/images/ep.jpg'),
+                                    backgroundImage: profile_image == null?AssetImage('assets/images/logo.png')
+                                        :profile_image == ""? AssetImage( 'assets/images/logo.png')
+                                        :NetworkImage(profile_image),
                                   ),
                                 ),
                                 Positioned(
