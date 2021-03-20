@@ -39,18 +39,27 @@ class Locations {
     String current_uid = prefs.getString('userID');
     String playerID = prefs.getString("playerID");
     String phone = prefs.getString("phone");
-
+    var status;
     /// StreamSubscription<Position> positionStream =
     ///  29.3083333
     /// 30.8447222
     Geolocator.getPositionStream().listen((Position position) {
       if (position != null) {
-        var distance = Geolocator.distanceBetween(
-            position.latitude, position.longitude, 29.3083333, 30.8447222);
+        var distance = Geolocator.distanceBetween(position.latitude, position.longitude, 29.3083333, 30.8447222);
         print("distance    $distance");
-        if (distance > 25000) {
-          /// out of zoon
-          ///
+
+        firestore
+            .collection('delivery_boys')
+            .doc(userID)
+            .snapshots()
+            .listen((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            status = documentSnapshot.get('status');
+          }
+        });
+
+        if (distance > 25000 && status) {
+          /// out of zoom
           PostViewModel postViewModel = new PostViewModel();
           DateTime date = DateTime.now();
 
@@ -59,6 +68,8 @@ class Locations {
 
           del_boy_off(current_uid);
         }
+
+      if(userID!=null){
         FirebaseFirestore.instance
             .collection('locations')
             .doc(userID)
@@ -77,6 +88,8 @@ class Locations {
             });
           }
         });
+      }
+
       }
     });
   }
