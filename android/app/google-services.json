@@ -8,6 +8,101 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:97040988883:android:0d7f5b410731bfa19e7226",
+        "android_client_info": {
+          "package_name": "com.alrashidi.app.talabk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvZ8WZWwEF16wjNjVzUt4X-qvDf3g3hXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97040988883:android:e355b7a5e624bcd79e7226",
+        "android_client_info": {
+          "package_name": "com.alrashidi.app.talabk.delivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvZ8WZWwEF16wjNjVzUt4X-qvDf3g3hXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97040988883:android:a8682b5c41fdf0ba9e7226",
+        "android_client_info": {
+          "package_name": "com.example.delivery_boy_talabak_2020_2021"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97040988883-7041gkh84rgs2d4g388df4o048rvs33g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.delivery_boy_talabak_2020_2021",
+            "certificate_hash": "c1dbd00c2a2f543f95f40ead9557b8f316d8fb41"
+          }
+        },
+        {
+          "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvZ8WZWwEF16wjNjVzUt4X-qvDf3g3hXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "97040988883-iv3p0gokssor4e5dmpoo3897bofnceib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:97040988883:android:9103e2469ece93df9e7226",
         "android_client_info": {
           "package_name": "com.example.talabak_delivery_boy"

@@ -1,4 +1,4 @@
-package com.example.talabak_delivery_boy
+package com.alrashidi.app.talabk.delivery
 
 import io.flutter.embedding.android.FlutterActivity
 
