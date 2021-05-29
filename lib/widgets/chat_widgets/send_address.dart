@@ -61,7 +61,7 @@ class Send_Address {
   Notifications notification = new Notifications();
   String deliveryPlayerId = "";
   fun_send_address() {
-    postViewModel.getPlayerId(other_uid).then((value) {
+    postViewModel.getPlayerIdUser(other_uid).then((value) {
       deliveryPlayerId = value;
     });
     Size size = MediaQuery.of(context).size;

@@ -11,6 +11,7 @@ import 'package:rating_dialog/rating_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/show_photo_in_one_screan.dart';
 import 'package:talabak_delivery_boy/utili_class.dart';
+import 'package:talabak_delivery_boy/webServices/locations.dart';
 import 'package:talabak_delivery_boy/webServices/notifications.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 import 'package:talabak_delivery_boy/widgets/chat_widgets/Drow_Record.dart';
@@ -124,7 +125,7 @@ var take_reseat=false;
       setState(() {
         flag = " ";
       });
-      postViewModel.getPlayerId(other_uid).then((value) {
+      postViewModel.getPlayerIdUser(other_uid).then((value) {
         setState(() {
           print('in_timeeee::$value:::::$other_uid');
           clientPlayerID = value;
@@ -148,6 +149,8 @@ var take_reseat=false;
 my_init_stat();
 
 
+Locations locations = new Locations();
+locations.getLocationContenously('status');
   }
 
   refresh() {

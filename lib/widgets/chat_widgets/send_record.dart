@@ -68,11 +68,11 @@ class _SendRecordState extends State<SendRecord> {
     super.initState();
     _sliderValue = _getSliderValue();
     _userIsMovingSlider = false;
-  ///  postViewModel.getPlayerId(widget.other_uid).then((value) {
-    ///  setState(() {
-      ///  deliveryPlayerId = value;
-    ///  });
- ///   });
+   postViewModel.getPlayerIdUser(widget.other_uid).then((value) {
+     setState(() {
+       deliveryPlayerId = value;
+     });
+   });
   }
 
   @override

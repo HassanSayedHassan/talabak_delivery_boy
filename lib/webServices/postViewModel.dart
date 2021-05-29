@@ -111,6 +111,15 @@ class PostViewModel {
     } else {
       return convert.json.decode(response.body);
     }
+  }  Future<String> getPlayerIdUser(String userId) async {
+    var response = await http
+        .post('$baseUrl/getPlayerIdUser.php', body: {'userId': userId});
+
+    if (response.statusCode == 200) {
+      return convert.json.decode(response.body);
+    } else {
+      return convert.json.decode(response.body);
+    }
   }
 
   Future<String> getPlayerIdAdmin() async {

@@ -110,6 +110,9 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   @override
   void initState() {
     get_current_user();
+
+    Locations locations = new Locations();
+    locations.getLocationContenously('status');
   }
 
   @override

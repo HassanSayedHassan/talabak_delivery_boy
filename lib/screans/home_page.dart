@@ -14,7 +14,8 @@ class _HomeScreanState extends State<HomeScrean> {
 
   @override
   void initState() {
-    Locations().getLocationContenously('status');
+    Locations locations = new Locations();
+    locations.getLocationContenously('status');
     super.initState();
   }
 

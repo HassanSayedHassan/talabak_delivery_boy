@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
@@ -39,7 +40,7 @@ class Locations {
     String current_uid = prefs.getString('userID');
     String playerID = prefs.getString("playerID");
     String phone = prefs.getString("phone");
-    var status;
+    var status=false;
     /// StreamSubscription<Position> positionStream =
     ///  29.3083333
     /// 30.8447222
@@ -66,10 +67,12 @@ class Locations {
            postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
                'false', userID, distance.toString(), date.toString());
 
-          del_boy_off(current_uid);
+        //  del_boy_off(current_uid);
         }
 
       if(userID!=null){
+        print("distance username   $userID");
+      //  getLocationCons(firestore,userID);
         FirebaseFirestore.instance
             .collection('locations')
             .doc(userID)
@@ -81,6 +84,7 @@ class Locations {
               'latitude': position.latitude,
               'longitude': position.longitude,
             });
+            print("distance update   $distance");
           } else {
             firestore.collection('locations').doc(userID).set({
               'latitude': position.latitude,
@@ -88,9 +92,44 @@ class Locations {
             });
           }
         });
+        getLocationCons(firestore,userID);
       }
 
       }
+    });
+  }
+
+  getLocationCons(FirebaseFirestore firestore,String userID)async{
+
+    await BackgroundLocation.startLocationService(
+        distanceFilter: 20);
+    BackgroundLocation.getLocationUpdates((location) {
+      FirebaseFirestore.instance
+          .collection('locations')
+          .doc(userID)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          // ignore: deprecated_member_use
+          firestore.collection('locations').doc(userID).update({
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+          });
+        } else {
+          firestore.collection('locations').doc(userID).set({
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+          });
+        }
+      print('This is current Location ');
+    });
+
+      print('''\n
+                        Latitude:  ${location.latitude}
+                        Longitude: ${location.longitude}
+                        Altitude: ${location.altitude}
+
+                      ''');
     });
   }
 
