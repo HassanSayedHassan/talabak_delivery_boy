@@ -20,11 +20,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Notifications notifications;
+  Notifications notifications = new Notifications();
   SharedPreferences getUserData;
   Future<SharedPreferences> preferences = SharedPreferences.getInstance();
   String name = "";
-  Widget app = HomeScrean();
+  Widget app = Container();
 
   var current_name;
   Future check_current_user() async {
@@ -34,19 +34,18 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         app = LogIn();
       });
+    }else{
+      setState(() {
+        app = HomeScrean();
+      });
     }
   }
   @override
   Future<void> initState()  {
     check_current_user();
 
-    notifications = new Notifications();
-    OneSignal.shared.init("3bf052b4-bda6-4553-bd78-118ea7909359", iOSSettings: {
-      OSiOSSettings.autoPrompt: false,
-      OSiOSSettings.inAppLaunchUrl: false
-    });
-    OneSignal.shared
-        .setInFocusDisplayType(OSNotificationDisplayType.notification);
+
+    notifications.initOneSignal();
     notifications.setNotificationReceivedHandler();
     notifications.setNotificationOpenedHandler();
     super.initState();

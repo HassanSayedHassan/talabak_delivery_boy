@@ -55,7 +55,8 @@ class _Message_Dilevery_ClintState extends State<Message_Dilevery_Clint> {
   var other_uid;
   var clint_phone;
   var flag = '123';
-
+  String playerID = '';
+  String phone = '';
   var current_email;
   var current_name;
   var current_uid;
@@ -76,9 +77,15 @@ var take_reseat=false;
 
   my_init_stat() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    current_name = prefs.getString('name');
-    current_uid = prefs.getString('userID');
-    current_email = prefs.getString('email');
+
+    setState(() {
+      current_uid = prefs.getString('userID');
+      current_name = prefs.getString("name");
+      playerID = prefs.getString("playerID");
+      phone = prefs.getString("phone");
+
+      current_email = prefs.getString('email');
+    });
 
     firestore
         .collection('users')
@@ -150,7 +157,7 @@ my_init_stat();
 
 
 Locations locations = new Locations();
-locations.getLocationContenously('status');
+locations.getLocationContenously('status',current_uid,playerID,current_name,phone);
   }
 
   refresh() {

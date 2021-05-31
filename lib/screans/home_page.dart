@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/screans/Profile_screan.dart';
 import 'package:talabak_delivery_boy/screans/chat_clints.dart';
 import 'package:talabak_delivery_boy/webServices/locations.dart';
@@ -10,12 +11,27 @@ class HomeScrean extends StatefulWidget {
 }
 
 class _HomeScreanState extends State<HomeScrean> {
-
-
+  String name = 'hi';
+  String profile_image;
+  String current_uid;
+  String phone;
+  String playerID;
+shared()async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  //name= prefs.getString( 'name' );
+  setState(() {
+    current_uid = prefs.getString('userID');
+    name = prefs.getString("name");
+    playerID = prefs.getString("playerID");
+    phone = prefs.getString("phone");
+  });
+  //
+  // Locations locations = new Locations();
+  // locations.getLocationContenously('status',current_uid,playerID,name,phone);
+}
   @override
   void initState() {
-    Locations locations = new Locations();
-    locations.getLocationContenously('status');
+  shared();
     super.initState();
   }
 

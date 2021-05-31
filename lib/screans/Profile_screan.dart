@@ -39,7 +39,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   Locations locations = new Locations();
   var appcolor = Color(0xFF12c0c7);
   double  rates = 0.0;
-  String userID;
+
 
   var flag = "123";
   var my_orders_number = 0;
@@ -50,12 +50,15 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   get_current_user() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //name= prefs.getString( 'name' );
-    current_uid = prefs.getString('userID');
-    userID = prefs.getString("userID");
-    name = prefs.getString("name");
-    playerID = prefs.getString("playerID");
-    phone = prefs.getString("phone");
+    setState(() {
+      current_uid = prefs.getString('userID');
+      name = prefs.getString("name");
+      playerID = prefs.getString("playerID");
+      phone = prefs.getString("phone");
+    });
     //profile_image= prefs.getString( 'email' );
+    locations.getLocationContenously('status',current_uid,playerID,name,phone);
+    print("distance123    $current_uid");
 
     FirebaseFirestore.instance
         .collection('orders')
@@ -110,9 +113,8 @@ class _Profile_ScreansState extends State<Profile_Screan> {
   @override
   void initState() {
     get_current_user();
-
-    Locations locations = new Locations();
-    locations.getLocationContenously('status');
+    //
+    //
   }
 
   @override
@@ -195,7 +197,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
                                             playerID,
                                             'offline',
                                             'true',
-                                            userID,
+                                            current_uid,
                                             '1',
                                             date.toString())
                                             .then((value) {

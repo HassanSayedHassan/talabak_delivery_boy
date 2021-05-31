@@ -31,107 +31,102 @@ class Locations {
     return distanceInMeters;
   }
 
-  getLocationContenously(String status) async {
+  getLocationContenously(String status,String userID,String playerID,String name,String phone) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userID = prefs.getString("userID");
-    String name = prefs.getString("name");
-    String current_uid = prefs.getString('userID');
-    String playerID = prefs.getString("playerID");
-    String phone = prefs.getString("phone");
     var status=false;
     /// StreamSubscription<Position> positionStream =
     ///  29.3083333
     /// 30.8447222
     Geolocator.getPositionStream().listen((Position position) {
       if (position != null) {
-        var distance = Geolocator.distanceBetween(position.latitude, position.longitude, 29.3083333, 30.8447222);
-        print("distance    $distance");
+        var distance = Geolocator.distanceBetween(
+            position.latitude, position.longitude, 29.3083333, 30.8447222);
+        // print("distance123    $userID");
+        //
+        // firestore
+        //     .collection('delivery_boys')
+        //     .doc(userID)
+        //     .snapshots()
+        //     .listen((DocumentSnapshot documentSnapshot) {
+        //   if (documentSnapshot.exists) {
+        //     status = documentSnapshot.get('status');
+        //   }
+        // });
+        //
+        // if (distance > 25000 && status) {
+        //   /// out of zoom
+        //   PostViewModel postViewModel = new PostViewModel();
+        //   DateTime date = DateTime.now();
+        //
+        //    postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
+        //        'false', userID, distance.toString(), date.toString());
+        //
+        //   del_boy_off(userID);
+        // }
 
-        firestore
-            .collection('delivery_boys')
-            .doc(userID)
-            .snapshots()
-            .listen((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            status = documentSnapshot.get('status');
-          }
-        });
+        if (userID != null) {
+          print("distance username   $userID");
+          //  getLocationCons(firestore,userID);
+          FirebaseFirestore.instance
+              .collection('locations')
+              .doc(userID)
+              .get()
+              .then((DocumentSnapshot documentSnapshot) {
+            if (documentSnapshot.exists) {
+              // ignore: deprecated_member_use
+              firestore.collection('locations').doc(userID).update({
+                'latitude': position.latitude,
+                'longitude': position.longitude,
+              });
+              print("distance update   $distance");
+            } else {
+              firestore.collection('locations').doc(userID).set({
+                'latitude': position.latitude,
+                'longitude': position.longitude,
+              });
+            }
+          });
 
-        if (distance > 25000 && status) {
-          /// out of zoom
-          PostViewModel postViewModel = new PostViewModel();
-          DateTime date = DateTime.now();
-
-           postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
-               'false', userID, distance.toString(), date.toString());
-
-        //  del_boy_off(current_uid);
+          print("distance123    $userID");
+          // getLocationCons(firestore,userID);
+          // }
         }
-
-      if(userID!=null){
-        print("distance username   $userID");
-      //  getLocationCons(firestore,userID);
-        FirebaseFirestore.instance
-            .collection('locations')
-            .doc(userID)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            // ignore: deprecated_member_use
-            firestore.collection('locations').doc(userID).update({
-              'latitude': position.latitude,
-              'longitude': position.longitude,
-            });
-            print("distance update   $distance");
-          } else {
-            firestore.collection('locations').doc(userID).set({
-              'latitude': position.latitude,
-              'longitude': position.longitude,
-            });
-          }
-        });
-        getLocationCons(firestore,userID);
-      }
-
       }
     });
   }
-
-  getLocationCons(FirebaseFirestore firestore,String userID)async{
-
-    await BackgroundLocation.startLocationService(
-        distanceFilter: 20);
-    BackgroundLocation.getLocationUpdates((location) {
-      FirebaseFirestore.instance
-          .collection('locations')
-          .doc(userID)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          // ignore: deprecated_member_use
-          firestore.collection('locations').doc(userID).update({
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-          });
-        } else {
-          firestore.collection('locations').doc(userID).set({
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-          });
-        }
-      print('This is current Location ');
-    });
-
-      print('''\n
-                        Latitude:  ${location.latitude}
-                        Longitude: ${location.longitude}
-                        Altitude: ${location.altitude}
-
-                      ''');
-    });
-  }
+  //
+  // getLocationCons(FirebaseFirestore firestore,String userID)async{
+  //
+  //
+  //   await BackgroundLocation.startLocationService(
+  //       distanceFilter: 20);
+  //   BackgroundLocation.getLocationUpdates((location) {
+  //     firestore
+  //         .collection('locations')
+  //         .doc(userID)
+  //         .get()
+  //         .then((DocumentSnapshot documentSnapshot) {
+  //       if (documentSnapshot.exists) {
+  //         print("distance123321  exist  $userID");
+  //         // ignore: deprecated_member_use
+  //         firestore.collection('locations').doc(userID).update({
+  //           'latitude': location.latitude,
+  //           'longitude': location.longitude,
+  //         });
+  //       } else {
+  //         print("distance123321  not exist  $userID");
+  //         firestore.collection('locations').doc(userID).set({
+  //           'latitude': location.latitude,
+  //           'longitude': location.longitude,
+  //         });
+  //       }
+  //     print('This is current Location ');
+  //   });
+  //
+  //     print('\nLatitude:  ${location.latitude}Longitude: ${location.longitude}Altitude: ${location.altitude}');
+  //   });
+  // }
 
   Future<String> checkRequestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
