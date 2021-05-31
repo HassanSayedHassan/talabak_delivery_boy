@@ -42,28 +42,28 @@ class Locations {
       if (position != null) {
         var distance = Geolocator.distanceBetween(
             position.latitude, position.longitude, 29.3083333, 30.8447222);
-        // print("distance123    $userID");
-        //
-        // firestore
-        //     .collection('delivery_boys')
-        //     .doc(userID)
-        //     .snapshots()
-        //     .listen((DocumentSnapshot documentSnapshot) {
-        //   if (documentSnapshot.exists) {
-        //     status = documentSnapshot.get('status');
-        //   }
-        // });
-        //
-        // if (distance > 25000 && status) {
-        //   /// out of zoom
-        //   PostViewModel postViewModel = new PostViewModel();
-        //   DateTime date = DateTime.now();
-        //
-        //    postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
-        //        'false', userID, distance.toString(), date.toString());
-        //
-        //   del_boy_off(userID);
-        // }
+        print("distance123    $userID");
+
+        firestore
+            .collection('delivery_boys')
+            .doc(userID)
+            .snapshots()
+            .listen((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            status = documentSnapshot.get('status');
+          }
+        });
+
+        if (distance > 25000 && status) {
+          /// out of zoom
+          PostViewModel postViewModel = new PostViewModel();
+          DateTime date = DateTime.now();
+
+           postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
+               'false', userID, distance.toString(), date.toString());
+
+          del_boy_off(userID);
+        }
 
         if (userID != null) {
           print("distance username   $userID");
