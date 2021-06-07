@@ -81,11 +81,6 @@ class _MyApplicationState extends State<MyApplication> {
   @override
   void initState() {
     locations = new Locations();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     locations.checkRequestPermission().then((value) {
       print("status: $value");
       switch (value) {
@@ -98,14 +93,22 @@ class _MyApplicationState extends State<MyApplication> {
         default:
       }
     });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+
     return widget.app;
+
   }
 
   void _showAlert(BuildContext context) {
     Widget okButton = FlatButton(
       child: Text("OK"),
       onPressed: () {
-        locations.requestLocation();
+
         Navigator.pop(context);
       },
     );
@@ -114,7 +117,7 @@ class _MyApplicationState extends State<MyApplication> {
     AlertDialog alert = AlertDialog(
       title: Text("Location permission"),
       content: Text(
-          "In order to benefit from the application properly,\n the site service must be activated, and that is to choose the nearest delegate to collect the images within the fastest time"),
+          "This app collects location data to enable to manager can track you when you in work time even when the app is closed or not in use."),
       actions: [
         okButton,
       ],

@@ -96,37 +96,37 @@ class Locations {
     });
   }
   //
-  // getLocationCons(FirebaseFirestore firestore,String userID)async{
-  //
-  //
-  //   await BackgroundLocation.startLocationService(
-  //       distanceFilter: 20);
-  //   BackgroundLocation.getLocationUpdates((location) {
-  //     firestore
-  //         .collection('locations')
-  //         .doc(userID)
-  //         .get()
-  //         .then((DocumentSnapshot documentSnapshot) {
-  //       if (documentSnapshot.exists) {
-  //         print("distance123321  exist  $userID");
-  //         // ignore: deprecated_member_use
-  //         firestore.collection('locations').doc(userID).update({
-  //           'latitude': location.latitude,
-  //           'longitude': location.longitude,
-  //         });
-  //       } else {
-  //         print("distance123321  not exist  $userID");
-  //         firestore.collection('locations').doc(userID).set({
-  //           'latitude': location.latitude,
-  //           'longitude': location.longitude,
-  //         });
-  //       }
-  //     print('This is current Location ');
-  //   });
-  //
-  //     print('\nLatitude:  ${location.latitude}Longitude: ${location.longitude}Altitude: ${location.altitude}');
-  //   });
-  // }
+  getLocationCons(String userID)async{
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    await BackgroundLocation.startLocationService(
+        distanceFilter: 20);
+    BackgroundLocation.getLocationUpdates((location) {
+      firestore
+          .collection('locations')
+          .doc(userID)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          print("distance123321  exist  $userID");
+          // ignore: deprecated_member_use
+          firestore.collection('locations').doc(userID).update({
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+          });
+        } else {
+          print("distance123321  not exist  $userID");
+          firestore.collection('locations').doc(userID).set({
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+          });
+        }
+      print('This is current Location ');
+    });
+
+      print('\nLatitude:  ${location.latitude}Longitude: ${location.longitude}Altitude: ${location.altitude}');
+    });
+  }
 
   Future<String> checkRequestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();

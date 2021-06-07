@@ -41,6 +41,7 @@ class Notifications {
   }
 
   postNotification(String playerID, String title, String content) async {
+    print('objectFFFFF::::$playerID');
     var notification = OSCreateNotification(
         playerIds: [playerID],
         content: content,

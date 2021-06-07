@@ -1131,7 +1131,6 @@ locations.getLocationContenously('status',current_uid,playerID,current_name,phon
             child: Center(
               child: Container(
                 width: MediaQuery.of(context).size.width - 10,
-                height: MediaQuery.of(context).size.height - 250,
                 padding: EdgeInsets.all(20),
                 color: Colors.white,
                 child: SingleChildScrollView(
@@ -1191,7 +1190,7 @@ locations.getLocationContenously('status',current_uid,playerID,current_name,phon
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
-                        height: MediaQuery.of(context).size.height - 400,
+
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: FileImage(reseat_Image),

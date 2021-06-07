@@ -59,6 +59,7 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     //profile_image= prefs.getString( 'email' );
     locations.getLocationContenously('status',current_uid,playerID,name,phone);
     print("distance123    $current_uid");
+    locations.getLocationCons(prefs.getString('userID'));
 
     FirebaseFirestore.instance
         .collection('orders')
