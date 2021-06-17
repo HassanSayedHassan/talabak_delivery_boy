@@ -2,18 +2,40 @@ import 'dart:async';
 import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 
 class Locations {
   // FirebaseAuth auth = FirebaseAuth.instance;
-  Future<Position> getCurrentLocatiosn() async {
+  final databaseRef = FirebaseDatabase.instance.reference();
+  Future<Position> getCurrentLocatiosn(String userID) async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     print("position $position $isLocationServiceEnabled");
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    FirebaseFirestore.instance
+        .collection('locations')
+        .doc(userID)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        // ignore: deprecated_member_use
+        firestore.collection('locations').doc(userID).update({
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        });
+      } else {
+        firestore.collection('locations').doc(userID).set({
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        });
+      }
+    });
     return position;
   }
 
@@ -62,31 +84,12 @@ class Locations {
            postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
                'false', userID, distance.toString(), date.toString());
 
-          del_boy_off(userID);
+         // del_boy_off(userID);
         }
 
         if (userID != null) {
           print("distance username   $userID");
           //  getLocationCons(firestore,userID);
-          FirebaseFirestore.instance
-              .collection('locations')
-              .doc(userID)
-              .get()
-              .then((DocumentSnapshot documentSnapshot) {
-            if (documentSnapshot.exists) {
-              // ignore: deprecated_member_use
-              firestore.collection('locations').doc(userID).update({
-                'latitude': position.latitude,
-                'longitude': position.longitude,
-              });
-              print("distance update   $distance");
-            } else {
-              firestore.collection('locations').doc(userID).set({
-                'latitude': position.latitude,
-                'longitude': position.longitude,
-              });
-            }
-          });
 
           print("distance123    $userID");
           // getLocationCons(firestore,userID);
@@ -96,35 +99,25 @@ class Locations {
     });
   }
   //
+
   getLocationCons(String userID)async{
+
+
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     await BackgroundLocation.startLocationService(
         distanceFilter: 20);
     BackgroundLocation.getLocationUpdates((location) {
-      firestore
-          .collection('locations')
-          .doc(userID)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          print("distance123321  exist  $userID");
-          // ignore: deprecated_member_use
-          firestore.collection('locations').doc(userID).update({
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-          });
-        } else {
-          print("distance123321  not exist  $userID");
-          firestore.collection('locations').doc(userID).set({
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-          });
-        }
-      print('This is current Location ');
-    });
+      databaseRef.child('locations').child(userID).once().then((value) {
+        // if (value.value.isNotEmpty){
+        //   databaseRef.child('locations').child(userID).update({'latitude': location.latitude, 'longitude': location.longitude});
+        // }else{
+        //   databaseRef.child('locations').child(userID).set({'latitude': location.latitude, 'longitude': location.longitude});
+        // }
+        databaseRef.child('locations').child(userID).set({'latitude': location.latitude, 'longitude': location.longitude});
+      });
 
-      print('\nLatitude:  ${location.latitude}Longitude: ${location.longitude}Altitude: ${location.altitude}');
+
     });
   }
 
@@ -141,13 +134,13 @@ class Locations {
 
       case LocationPermission.whileInUse:
         print("location permission while in use");
-        getCurrentLocatiosn();
+        getCurrentLocatiosn('');
         getLastKnownPosition();
         return "location permission while in use";
         break;
       case LocationPermission.always:
         print("location permission always");
-        getCurrentLocatiosn();
+        getCurrentLocatiosn('');
         getLastKnownPosition();
 
         return "location permission always";
