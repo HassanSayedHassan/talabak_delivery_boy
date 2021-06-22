@@ -58,9 +58,10 @@ class _Profile_ScreansState extends State<Profile_Screan> {
     });
     //profile_image= prefs.getString( 'email' );
     locations.getLocationContenously('status',current_uid,playerID,name,phone);
+    Update_boy_pos(current_uid);
     print("distance123    $current_uid");
-    locations.getCurrentLocatiosn(current_uid);
-    locations.getLocationCons(prefs.getString('userID'));
+  //  locations.getCurrentLocatiosn(current_uid);
+    //locations.getLocationCons(current_uid);
 
     FirebaseFirestore.instance
         .collection('orders')
@@ -373,6 +374,28 @@ class _Profile_ScreansState extends State<Profile_Screan> {
         ),
       ),
     );
+  }
+  Update_boy_pos(userID) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    FirebaseFirestore.instance
+        .collection('locations')
+        .doc(userID)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        // ignore: deprecated_member_use
+        firestore.collection('locations').doc(userID).update({
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        });
+      } else {
+        firestore.collection('locations').doc(userID).set({
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        });
+      }
+    });
   }
 }
 

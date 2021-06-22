@@ -8,34 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabak_delivery_boy/webServices/postViewModel.dart';
 
 class Locations {
-  // FirebaseAuth auth = FirebaseAuth.instance;
   final databaseRef = FirebaseDatabase.instance.reference();
-  Future<Position> getCurrentLocatiosn(String userID) async {
+  // FirebaseAuth auth = FirebaseAuth.instance;
+  Future<Position> getCurrentLocatiosn() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     print("position $position $isLocationServiceEnabled");
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    FirebaseFirestore.instance
-        .collection('locations')
-        .doc(userID)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        // ignore: deprecated_member_use
-        firestore.collection('locations').doc(userID).update({
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-        });
-      } else {
-        firestore.collection('locations').doc(userID).set({
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-        });
-      }
-    });
     return position;
   }
 
@@ -60,7 +40,7 @@ class Locations {
     /// StreamSubscription<Position> positionStream =
     ///  29.3083333
     /// 30.8447222
-    Geolocator.getPositionStream().listen((Position position) {
+    Geolocator.getPositionStream().listen((Position position) async {
       if (position != null) {
         var distance = Geolocator.distanceBetween(
             position.latitude, position.longitude, 29.3083333, 30.8447222);
@@ -84,42 +64,31 @@ class Locations {
            postViewModel.deliveryBoyLogs(phone, name, playerID, 'out of zone',
                'false', userID, distance.toString(), date.toString());
 
-         // del_boy_off(userID);
+          del_boy_off(userID);
         }
 
         if (userID != null) {
           print("distance username   $userID");
-          //  getLocationCons(firestore,userID);
+          databaseRef.child('locations').child(userID).set({'latitude': position.latitude, 'longitude': position.longitude});
+          print ("latituderrrrrrrrrr ${position.latitude} ");
 
-          print("distance123    $userID");
-          // getLocationCons(firestore,userID);
+          await BackgroundLocation.startLocationService(
+              distanceFilter: 20);
+          BackgroundLocation.getLocationUpdates((location) {
+
+
+            print('\nLatitude:  ${location.latitude}Longitude: ${location.longitude}Altitude: ${location.altitude}');
+          });
           // }
         }
       }
     });
   }
   //
-
-  getLocationCons(String userID)async{
-
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    await BackgroundLocation.startLocationService(
-        distanceFilter: 20);
-    BackgroundLocation.getLocationUpdates((location) {
-      databaseRef.child('locations').child(userID).once().then((value) {
-        // if (value.value.isNotEmpty){
-        //   databaseRef.child('locations').child(userID).update({'latitude': location.latitude, 'longitude': location.longitude});
-        // }else{
-        //   databaseRef.child('locations').child(userID).set({'latitude': location.latitude, 'longitude': location.longitude});
-        // }
-        databaseRef.child('locations').child(userID).set({'latitude': location.latitude, 'longitude': location.longitude});
-      });
+   getLocationCons(String userID)async{
 
 
-    });
-  }
+   }
 
   Future<String> checkRequestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -134,13 +103,13 @@ class Locations {
 
       case LocationPermission.whileInUse:
         print("location permission while in use");
-        getCurrentLocatiosn('');
+        getCurrentLocatiosn();
         getLastKnownPosition();
         return "location permission while in use";
         break;
       case LocationPermission.always:
         print("location permission always");
-        getCurrentLocatiosn('');
+        getCurrentLocatiosn();
         getLastKnownPosition();
 
         return "location permission always";

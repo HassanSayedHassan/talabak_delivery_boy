@@ -156,8 +156,8 @@ var take_reseat=false;
 my_init_stat();
 
 
-Locations locations = new Locations();
-locations.getLocationContenously('status',current_uid,playerID,current_name,phone);
+//Locations locations = new Locations();
+//locations.getLocationContenously('status',current_uid,playerID,current_name,phone);
   }
 
   refresh() {

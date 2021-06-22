@@ -49,9 +49,9 @@ dependencies:
   convert: ^2.1.1
   custom_switch: ^0.0.1
   flutter_map: any
-  onesignal_flutter: ^2.6.1
+  onesignal_flutter: any
   flutter_pin_code_fields: ^1.1.0
-  background_location: ^0.6.0
+  background_location: any
   page_view_indicators:
   rating_dialog:
   cached_network_image:
